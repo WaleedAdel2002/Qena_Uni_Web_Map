@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>خريطة إنجازات الجامعة (2023 - 2026)</title>
+    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <!-- Google Fonts (Cairo) -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     
     <style>
@@ -41,7 +44,6 @@
 
         .app-container { display: flex; width: 100%; height: calc(100vh - 60px); margin-top: 60px; position: relative; }
         
-        /* Sidebar Styles with Toggle Animation */
         .sidebar { 
             width: var(--sidebar-width); 
             background: var(--panel-bg); 
@@ -82,11 +84,8 @@
             transition: background 0.2s;
         }
 
-        .toggle-btn:hover {
-            background: #cbd5e1;
-        }
+        .toggle-btn:hover { background: #cbd5e1; }
 
-        /* Floating Open Button when Sidebar is closed */
         .open-sidebar-btn {
             position: absolute;
             top: 15px;
@@ -117,15 +116,60 @@
         .stat-box .number { font-size: 1.4rem; font-weight: 800; color: var(--primary-color); }
         .stat-box .label { font-size: 0.75rem; color: var(--text-muted); }
 
-        .sidebar-content { flex: 1; overflow-y: auto; padding: 20px; }
-        .section-title { font-size: 0.95rem; font-weight: 700; color: var(--text-main); margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
+        .sidebar-content { flex: 1; overflow-y: auto; padding: 16px 20px; }
 
-        .layers-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
+        /* Collapsible Section Accordion Styling */
+        .section-header {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-main);
+            padding: 10px 12px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            user-select: none;
+            transition: background 0.2s;
+        }
+
+        .section-header:hover {
+            background: #e2e8f0;
+        }
+
+        .section-header .chevron {
+            transition: transform 0.3s ease;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .section-header.collapsed .chevron {
+            transform: rotate(-90deg);
+        }
+
+        .collapsible-body {
+            max-height: 1000px;
+            overflow: hidden;
+            transition: max-height 0.3s ease-in-out, opacity 0.2s ease, margin 0.3s ease;
+            opacity: 1;
+            margin-bottom: 16px;
+        }
+
+        .collapsible-body.collapsed {
+            max-height: 0;
+            opacity: 0;
+            margin-bottom: 8px;
+            padding: 0;
+        }
+
+        .layers-list { display: flex; flex-direction: column; gap: 8px; }
         .layer-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 6px; }
         .layer-info { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; font-weight: 600; }
         .layer-color { width: 12px; height: 12px; border-radius: 50%; }
 
-        .filter-box { background: #f8fafc; border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; margin-bottom: 24px; }
+        .filter-box { background: #f8fafc; border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; }
         .date-inputs { display: flex; gap: 10px; }
         .form-group { flex: 1; }
         .form-group label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px; }
@@ -139,8 +183,9 @@
 
         #map { flex: 1; height: 100%; background: #e2e8f0; }
 
-        .popup-card { width: 240px; }
-        .popup-card img { width: 100%; height: 130px; object-fit: cover; border-radius: 6px; margin-bottom: 8px; }
+        .popup-card { width: 250px; }
+        .popup-card img, .popup-card video { width: 100%; height: 130px; object-fit: cover; border-radius: 6px; margin-bottom: 8px; }
+        .popup-card audio { width: 100%; height: 35px; margin-bottom: 8px; }
         .popup-card h4 { font-size: 0.95rem; color: var(--primary-color); margin-bottom: 4px; }
         .popup-card .layer-tag { display: inline-block; font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; margin-bottom: 6px; font-weight: 600; }
         .popup-card p { font-size: 0.8rem; color: #334155; margin-bottom: 8px; line-height: 1.4; }
@@ -189,45 +234,61 @@
                         <div class="label">طبقات مفعلة</div>
                     </div>
                 </div>
-                <!-- Close Button -->
                 <button class="toggle-btn" title="إغلاق القائمة" onclick="toggleSidebar(true)">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
 
             <div class="sidebar-content">
-                <div class="section-title">
+                
+                <!-- Section 1: Layers -->
+                <div class="section-header" onclick="toggleSection('layers-body', this)">
                     <span><i class="fa-solid fa-layer-group"></i> طبقات الإنجازات</span>
-                    <button style="background:none; border:none; color:var(--primary-color); cursor:pointer; font-size:0.75rem;" onclick="toggleAllLayers(true)">تحديد الكل</button>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <button style="background:none; border:none; color:var(--primary-color); cursor:pointer; font-size:0.75rem; font-weight:700;" onclick="event.stopPropagation(); toggleAllLayers(true)">تحديد الكل</button>
+                        <i class="fa-solid fa-chevron-down chevron"></i>
+                    </div>
                 </div>
-                <div class="layers-list" id="layers-container"></div>
+                <div class="collapsible-body" id="layers-body">
+                    <div class="layers-list" id="layers-container"></div>
+                </div>
 
-                <div class="section-title">
+                <!-- Section 2: Date Filter -->
+                <div class="section-header" onclick="toggleSection('filter-body', this)">
                     <span><i class="fa-solid fa-filter"></i> تصفية حسب الفترة الزمنية</span>
+                    <i class="fa-solid fa-chevron-down chevron"></i>
                 </div>
-                <div class="filter-box">
-                    <div class="date-inputs">
-                        <div class="form-group">
-                            <label>من:</label>
-                            <input type="date" class="form-control" id="filter-start-date" value="2023-07-01" onchange="filterData()">
-                        </div>
-                        <div class="form-group">
-                            <label>إلى:</label>
-                            <input type="date" class="form-control" id="filter-end-date" value="2026-08-31" onchange="filterData()">
+                <div class="collapsible-body" id="filter-body">
+                    <div class="filter-box">
+                        <div class="date-inputs">
+                            <div class="form-group">
+                                <label>من:</label>
+                                <input type="date" class="form-control" id="filter-start-date" value="2023-07-01" onchange="filterData()">
+                            </div>
+                            <div class="form-group">
+                                <label>إلى:</label>
+                                <input type="date" class="form-control" id="filter-end-date" value="2026-08-31" onchange="filterData()">
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="section-title">
+                <!-- Section 3: Achievements List -->
+                <div class="section-header" onclick="toggleSection('achievements-body', this)">
                     <span><i class="fa-solid fa-list-check"></i> قائمة الإنجازات المسجلة</span>
+                    <i class="fa-solid fa-chevron-down chevron"></i>
                 </div>
-                <div class="achievements-list" id="achievements-container"></div>
+                <div class="collapsible-body" id="achievements-body">
+                    <div class="achievements-list" id="achievements-container"></div>
+                </div>
+
             </div>
         </aside>
 
         <main id="map"></main>
     </div>
 
+    <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
@@ -266,7 +327,14 @@
             activeTileLayer.addTo(map);
         }
 
-        // Toggle Sidebar Open / Close
+        // Toggle Accordion Section
+        function toggleSection(bodyId, headerEl) {
+            const body = document.getElementById(bodyId);
+            body.classList.toggle('collapsed');
+            headerEl.classList.toggle('collapsed');
+        }
+
+        // Toggle Sidebar
         function toggleSidebar(collapse) {
             const sidebar = document.getElementById('sidebar');
             const openBtn = document.getElementById('open-sidebar-btn');
@@ -279,7 +347,6 @@
                 openBtn.style.display = 'none';
             }
 
-            // Adjust Map Dimensions
             setTimeout(() => {
                 if (map) map.invalidateSize();
             }, 300);
@@ -401,8 +468,8 @@
                 const marker = L.marker([item.lat, item.lng], { icon: customIcon }).addTo(map);
                 
                 let imageHTML = item.image ? `<img src="${item.image}" alt="${item.title}" onerror="this.style.display='none';">` : '';
-                let videoHTML = item.video ? `<video controls src="${item.video}" style="width:100%; height:130px; border-radius:6px; margin-bottom:8px;"></video>` : '';
-                let audioHTML = item.audio ? `<audio controls src="${item.audio}" style="width:100%; height:35px; margin-bottom:8px;"></audio>` : '';
+                let videoHTML = item.video ? `<video controls src="${item.video}"></video>` : '';
+                let audioHTML = item.audio ? `<audio controls src="${item.audio}"></audio>` : '';
                 let dateHTML = item.date ? `<div class="date"><i class="fa-regular fa-calendar"></i> ${item.date}</div>` : '';
 
                 const popupHTML = `
