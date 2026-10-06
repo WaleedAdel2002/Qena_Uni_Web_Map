@@ -40,10 +40,79 @@
         .map-type-btn.active { background: #ffffff; color: var(--primary-color); }
 
         .app-container { display: flex; width: 100%; height: calc(100vh - 60px); margin-top: 60px; position: relative; }
-        .sidebar { width: var(--sidebar-width); background: var(--panel-bg); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; z-index: 900; overflow: hidden; }
-        .sidebar-header { padding: 16px 20px; border-bottom: 1px solid var(--border-color); background: #f8fafc; }
         
-        .stats-card { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        /* Sidebar Styles with Toggle Animation */
+        .sidebar { 
+            width: var(--sidebar-width); 
+            background: var(--panel-bg); 
+            border-left: 1px solid var(--border-color); 
+            display: flex; 
+            flex-direction: column; 
+            z-index: 900; 
+            overflow: hidden; 
+            transition: margin-right 0.3s ease, transform 0.3s ease;
+            position: relative;
+        }
+
+        .sidebar.collapsed {
+            margin-right: calc(-1 * var(--sidebar-width));
+        }
+
+        .sidebar-header { 
+            padding: 16px 20px; 
+            border-bottom: 1px solid var(--border-color); 
+            background: #f8fafc; 
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .toggle-btn {
+            background: #e2e8f0;
+            border: none;
+            color: var(--text-main);
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .toggle-btn:hover {
+            background: #cbd5e1;
+        }
+
+        /* Floating Open Button when Sidebar is closed */
+        .open-sidebar-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 850;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.85rem;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.2s;
+        }
+
+        .open-sidebar-btn:hover {
+            transform: scale(1.03);
+            background: #1d4ed8;
+        }
+
+        .stats-card { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; flex: 1; }
         .stat-box { background: white; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); text-align: center; }
         .stat-box .number { font-size: 1.4rem; font-weight: 800; color: var(--primary-color); }
         .stat-box .label { font-size: 0.75rem; color: var(--text-muted); }
@@ -102,7 +171,13 @@
     </header>
 
     <div class="app-container">
-        <aside class="sidebar">
+        
+        <!-- Floating Open Button -->
+        <button class="open-sidebar-btn" id="open-sidebar-btn" onclick="toggleSidebar(false)">
+            <i class="fa-solid fa-bars"></i> عرض قائمة الإنجازات
+        </button>
+
+        <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="stats-card">
                     <div class="stat-box">
@@ -114,6 +189,10 @@
                         <div class="label">طبقات مفعلة</div>
                     </div>
                 </div>
+                <!-- Close Button -->
+                <button class="toggle-btn" title="إغلاق القائمة" onclick="toggleSidebar(true)">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
             </div>
 
             <div class="sidebar-content">
@@ -187,6 +266,25 @@
             activeTileLayer.addTo(map);
         }
 
+        // Toggle Sidebar Open / Close
+        function toggleSidebar(collapse) {
+            const sidebar = document.getElementById('sidebar');
+            const openBtn = document.getElementById('open-sidebar-btn');
+
+            if (collapse) {
+                sidebar.classList.add('collapsed');
+                openBtn.style.display = 'flex';
+            } else {
+                sidebar.classList.remove('collapsed');
+                openBtn.style.display = 'none';
+            }
+
+            // Adjust Map Dimensions
+            setTimeout(() => {
+                if (map) map.invalidateSize();
+            }, 300);
+        }
+
         function switchMapLayer(mode) {
             if (activeTileLayer) map.removeLayer(activeTileLayer);
             activeTileLayer = TILE_SERVERS[mode];
@@ -195,7 +293,6 @@
             document.getElementById('btn-satellite').classList.toggle('active', mode === 'satellite');
         }
 
-        // Fetch data automatically from data.json file
         function loadAchievementsFromJSON() {
             fetch('data.json')
                 .then(response => response.json())
@@ -248,7 +345,7 @@
                     <div class="title">${item.title}</div>
                     <div class="meta">
                         <span><i class="fa-solid fa-tag"></i> ${layer ? layer.name : ''}</span>
-                        <span><i class="fa-regular fa-calendar"></i> ${item.date}</span>
+                        ${item.date ? `<span><i class="fa-regular fa-calendar"></i> ${item.date}</span>` : ''}
                     </div>
                 `;
                 container.appendChild(card);
@@ -261,7 +358,7 @@
 
             return achievements.filter(item => {
                 const isLayerActive = activeLayers.has(item.layerId);
-                const isDateValid = (!startDate || item.date >= startDate) && (!endDate || item.date <= endDate);
+                const isDateValid = (!startDate || !item.date || item.date >= startDate) && (!endDate || !item.date || item.date <= endDate);
                 return isLayerActive && isDateValid;
             });
         }
@@ -302,13 +399,21 @@
                 });
 
                 const marker = L.marker([item.lat, item.lng], { icon: customIcon }).addTo(map);
+                
+                let imageHTML = item.image ? `<img src="${item.image}" alt="${item.title}" onerror="this.style.display='none';">` : '';
+                let videoHTML = item.video ? `<video controls src="${item.video}" style="width:100%; height:130px; border-radius:6px; margin-bottom:8px;"></video>` : '';
+                let audioHTML = item.audio ? `<audio controls src="${item.audio}" style="width:100%; height:35px; margin-bottom:8px;"></audio>` : '';
+                let dateHTML = item.date ? `<div class="date"><i class="fa-regular fa-calendar"></i> ${item.date}</div>` : '';
+
                 const popupHTML = `
                     <div class="popup-card">
-                        <img src="${item.image}" alt="${item.title}" onerror="this.src='https://via.placeholder.com/240x130?text=لا+توجد+صورة';">
+                        ${imageHTML}
+                        ${videoHTML}
+                        ${audioHTML}
                         <span class="layer-tag" style="background:${color}22; color:${color};">${layer ? layer.name : ''}</span>
                         <h4>${item.title}</h4>
-                        <p>${item.description || 'لا يوجد وصف محدد.'}</p>
-                        <div class="date"><i class="fa-regular fa-calendar"></i> ${item.date}</div>
+                        <p>${item.description || ''}</p>
+                        ${dateHTML}
                     </div>
                 `;
                 marker.bindPopup(popupHTML);
