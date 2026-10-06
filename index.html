@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>خريطة إنجازات الجامعة (2023 - 2026)</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+        #map {
+            height: 100vh;
+            width: 100%;
+            z-index: 1;
+        }
+        .leaflet-popup-content-wrapper {
+            direction: rtl;
+            text-align: right;
+            border-radius: 12px;
+            padding: 4px;
+        }
+        .leaflet-popup-content {
+            margin: 8px 12px;
+            min-width: 220px;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex flex-col md:flex-row">
+
+    <!-- Sidebar / Panel -->
+    <div id="sidebar" class="w-full md:w-96 bg-white shadow-2xl z-10 flex flex-col h-screen transition-all duration-300 absolute md:relative right-0 top-0 overflow-hidden">
+        
+        <!-- Header -->
+        <div class="bg-blue-900 text-white p-4 shadow-md flex justify-between items-center">
+            <div>
+                <h1 class="text-lg font-bold flex items-center gap-2">
+                    <i class="fa-solid me-1 fa-graduation-cap text-yellow-400"></i>
+                    إنجازات الجامعة
+                </h1>
+                <p class="text-xs text-blue-200 mt-1">يوليو 2023 - أغسطس 2026</p>
+            </div>
+            <button id="toggleAddModalBtn" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 shadow">
+                <i class="fa-solid fa-plus"></i> إضافـة إنجاز
+            </button>
+        </div>
+
+        <!-- Scrollable Content -->
+        <div class="flex-1 overflow-y-auto p-4 custom-scrollbar space-y-5">
+            
+            <!-- Quick Actions & Stats -->
+            <div class="grid grid-cols-2 gap-2 text-center">
+                <div class="bg-blue-50 border border-blue-200 p-2 rounded-lg">
+                    <span class="block text-xl font-bold text-blue-900" id="totalCount">0</span>
+                    <span class="text-xs text-blue-700">إجمالي الإنجازات</span>
+                </div>
+                <div class="bg-emerald-50 border border-emerald-200 p-2 rounded-lg">
+                    <span class="block text-xl font-bold text-emerald-900" id="activeLayersCount">11</span>
+                    <span class="text-xs text-emerald-700">طبقات مفعلة</span>
+                </div>
+            </div>
+
+            <!-- Import/Export Tools -->
+            <div class="bg-gray-50 p-3 rounded-lg border border-gray-200 text-xs flex justify-between items-center">
+                <span class="font-bold text-gray-700">إدارة البيانات:</span>
+                <div class="flex gap-2">
+                    <button onclick="exportData()" class="bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 transition" title="تصدير JSON">
+                        <i class="fa-solid fa-download"></i> تصدير
+                    </button>
+                    <label class="bg-purple-600 text-white px-2 py-1 rounded hover:bg-purple-700 transition cursor-pointer" title="استيراد JSON">
+                        <i class="fa-solid fa-upload"></i> استيراد
+                        <input type="file" id="importFileInput" accept=".json" class="hidden" onchange="importData(event)">
+                    </label>
+                </div>
+            </div>
+
+            <!-- Layer Controls -->
+            <div class="border rounded-lg p-3 bg-gray-50">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="font-bold text-sm text-gray-800 flex items-center gap-1">
+                        <i class="fa-solid fa-layer-group text-blue-600"></i> طبقات الإنجازات
+                    </h3>
+                    <button onclick="toggleAllLayers(true)" class="text-xs text-blue-600 hover:underline">تحديد الكل</button>
+                </div>
+                <div id="layersList" class="space-y-1.5 max-h-48 overflow-y-auto custom-scrollbar pl-1">
+                    <!-- Layer checkboxes will be generated here dynamically -->
+                </div>
+            </div>
+
+            <!-- Date Filter -->
+            <div class="border rounded-lg p-3 bg-gray-50">
+                <h3 class="font-bold text-sm text-gray-800 mb-2 flex items-center gap-1">
+                    <i class="fa-regular fa-calendar-days text-blue-600"></i> تصفية حسب الفترة الزمنية
+                </h3>
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                        <label class="block text-gray-600 mb-1">من:</label>
+                        <input type="month" id="startDate" min="2023-07" max="2026-08" value="2023-07" class="w-full border p-1 rounded">
+                    </div>
+                    <div>
+                        <label class="block text-gray-600 mb-1">إلى:</label>
+                        <input type="month" id="endDate" min="2023-07" max="2026-08" value="2026-08" class="w-full border p-1 rounded">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Items List -->
+            <div>
+                <h3 class="font-bold text-sm text-gray-800 mb-2 flex items-center gap-1">
+                    <i class="fa-solid fa-list-check text-blue-600"></i> قائمة الإنجازات المسجلة
+                </h3>
+                <div id="achievementsList" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">
+                    <!-- Cards will be populated here -->
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="p-2 border-t text-center text-xs text-gray-500 bg-gray-50">
+            مشروع خريطة ويب إنجازات الجامعة &copy; 2026
+        </div>
+    </div>
+
+    <!-- Map Area -->
+    <div class="flex-1 relative">
+        <div id="map"></div>
+        
+        <!-- Add Point Instructions Toast -->
+        <div id="clickNotice" class="hidden absolute top-4 left-1/2 transform -translate-x-1/2 z-[1000] bg-blue-900 text-white text-sm px-4 py-2 rounded-full shadow-lg border border-blue-400 flex items-center gap-2">
+            <i class="fa-solid fa-location-crosshairs animate-pulse text-yellow-400"></i>
+            انقر في أي مكان على الخريطة لتحديد موقع الإنجاز الجديد
+            <button onclick="cancelMapClick()" class="mr-2 text-xs bg-red-500 hover:bg-red-600 text-white px-2 py-0.5 rounded-full">إلغاء</button>
+        </div>
+    </div>
+
+    <!-- Add/Edit Achievement Modal -->
+    <div id="addModal" class="fixed inset-0 bg-black/50 z-[2000] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="bg-blue-900 text-white px-4 py-3 flex justify-between items-center">
+                <h3 class="font-bold text-base" id="modalTitle">إضافة إنجاز جديد</h3>
+                <button onclick="closeModal()" class="text-gray-300 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            
+            <form id="achievementForm" class="p-4 overflow-y-auto space-y-3 text-sm flex-1 custom-scrollbar">
+                <input type="hidden" id="editId">
+                
+                <div>
+                    <label class="block font-semibold mb-1">اسم الإنجاز / المشروع *</label>
+                    <input type="text" id="title" required placeholder="مثال: تطوير معمل الذكاء الاصطناعي" class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block font-semibold mb-1">الطبقة / التصنيف *</label>
+                        <select id="layerCategory" required class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-semibold mb-1">تاريخ الإنجاز *</label>
+                        <input type="date" id="achievementDate" min="2023-07-01" max="2026-08-31" required class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block font-semibold mb-1">خط العرض (Lat) *</label>
+                        <input type="number" step="any" id="lat" required class="w-full border rounded-lg p-2 bg-gray-50">
+                    </div>
+                    <div>
+                        <label class="block font-semibold mb-1">خط الطول (Lng) *</label>
+                        <input type="number" step="any" id="lng" required class="w-full border rounded-lg p-2 bg-gray-50">
+                    </div>
+                </div>
+
+                <div>
+                    <button type="button" onclick="enableMapPick()" class="w-full text-xs bg-gray-100 hover:bg-gray-200 border py-1.5 rounded text-blue-700 font-semibold flex items-center justify-center gap-1">
+                        <i class="fa-solid fa-map-pin"></i> اختيار الموقع بالنقر على الخريطة
+                    </button>
+                </div>
+
+                <div>
+                    <label class="block font-semibold mb-1">اسم/مسار الصورة داخل مجلد Image *</label>
+                    <input type="text" id="imagePath" placeholder="Image/building.jpg" required class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none dir-ltr text-right">
+                    <span class="text-[10px] text-gray-500">مثال: ضع الصورة داخل مجلد Image واكتب هنا: `Image/pic1.jpg`</span>
+                </div>
+
+                <div>
+                    <label class="block font-semibold mb-1">الوصف والتفاصيل</label>
+                    <textarea id="description" rows="3" placeholder="تفاصيل ووصف الإنجاز وما تم تحقيقه..." class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
+                </div>
+
+                <div class="pt-2 flex justify-end gap-2 border-t">
+                    <button type="button" onclick="closeModal()" class="px-4 py-2 border rounded-lg hover:bg-gray-100">إلغاء</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-bold">حفظ الإنجاز</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        // Layers definitions based on docx files
+        const LAYERS_CONFIG = {
+            "الإنشاءات والصيانة": { color: "#e11d48", icon: "fa-building" },
+            "البنية التحتية": { color: "#2563eb", icon: "fa-network-wired" },
+            "البيئة التعليمية": { color: "#16a34a", icon: "fa-book-open" },
+            "الخدمات اللوجستية": { color: "#d97706", icon: "fa-truck-ramps" },
+            "الطرق والبوابات": { color: "#4b5563", icon: "fa-road" },
+            "الموقع العام": { color: "#9333ea", icon: "fa-map-location-dot" },
+            "قائمة الأدلة التنظيمية": { color: "#0284c7", icon: "fa-file-lines" },
+            "قائمة التحول الرقمي": { color: "#0d9488", icon: "fa-laptop-code" },
+            "قائمة المشروعات الهندسية": { color: "#c05621", icon: "fa-compass-drafting" },
+            "قائمة مظلات السيارات": { color: "#64748b", icon: "fa-square-parking" },
+            "قائمة مظلات الطلاب": { color: "#059669", icon: "fa-umbrella" }
+        };
+
+        // Initial Sample Data
+        const initialData = [
+            {
+                id: "1",
+                title: "إنشاء مجمع المعامل المركزية",
+                category: "الإنشاءات والصيانة",
+                date: "2023-10-15",
+                lat: 26.1550,
+                lng: 32.7160,
+                image: "Image/sample1.jpg",
+                description: "تم الانتهاء من الأعمال الإنشائية والمكتبية لتجهيز المعامل التخصصية."
+            },
+            {
+                id: "2",
+                title: "تحديث شبكة الألياف الضوئية",
+                category: "البنية التحتية",
+                date: "2024-03-20",
+                lat: 26.1570,
+                lng: 32.7180,
+                image: "Image/sample2.jpg",
+                description: "ربط كافة المباني والأقسام بشبكة اتصالات فائقة السرعة."
+            }
+        ];
+
+        // App State
+        let map;
+        let markersGroup = {};
+        let achievements = [];
+        let activeLayers = new Set(Object.keys(LAYERS_CONFIG));
+        let isPickingLocation = false;
+
+        // Initialize Map & Application
+        document.addEventListener("DOMContentLoaded", () => {
+            initMap();
+            loadAchievements();
+            renderLayerControls();
+            populateCategoryDropdown();
+            setupEventListeners();
+            updateUI();
+        });
+
+        function initMap() {
+            // Default center coordinates (e.g. South Valley University area or default)
+            map = L.map('map').setView([26.1555, 32.7165], 15);
+
+            // OpenStreetMap Tile Layer
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            // Initialize layer groups for each category
+            Object.keys(LAYERS_CONFIG).forEach(cat => {
+                markersGroup[cat] = L.layerGroup().addTo(map);
+            });
+
+            // Map Click Event for selecting coordinates
+            map.on('click', (e) => {
+                if (isPickingLocation) {
+                    document.getElementById('lat').value = e.latlng.lat.toFixed(6);
+                    document.getElementById('lng').value = e.latlng.lng.toFixed(6);
+                    disableMapPick();
+                    openModal(false);
+                }
+            });
+        }
+
+        function loadAchievements() {
+            const savedData = localStorage.getItem('univ_achievements_data');
+            achievements = savedData ? JSON.parse(savedData) : initialData;
+        }
+
+        function saveData() {
+            localStorage.setItem('univ_achievements_data', JSON.stringify(achievements));
+            updateUI();
+        }
+
+        function renderLayerControls() {
+            const container = document.getElementById('layersList');
+            container.innerHTML = '';
+
+            Object.keys(LAYERS_CONFIG).forEach(cat => {
+                const layer = LAYERS_CONFIG[cat];
+                const checked = activeLayers.has(cat) ? 'checked' : '';
+                
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between text-xs py-1 hover:bg-gray-100 px-1 rounded';
+                div.innerHTML = `
+                    <label class="flex items-center gap-2 cursor-pointer flex-1">
+                        <input type="checkbox" ${checked} onchange="toggleLayer('${cat}')" class="rounded text-blue-600 focus:ring-blue-500">
+                        <span class="w-2.5 h-2.5 rounded-full inline-block" style="background-color: ${layer.color}"></span>
+                        <span class="text-gray-700">${cat}</span>
+                    </label>
+                    <i class="fa-solid ${layer.icon} text-gray-400 text-xs"></i>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function populateCategoryDropdown() {
+            const select = document.getElementById('layerCategory');
+            select.innerHTML = '';
+            Object.keys(LAYERS_CONFIG).forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat;
+                opt.textContent = cat;
+                select.appendChild(opt);
+            });
+        }
+
+        function updateUI() {
+            // Clear all current markers
+            Object.keys(markersGroup).forEach(cat => markersGroup[cat].clearLayers());
+
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            const listContainer = document.getElementById('achievementsList');
+            listContainer.innerHTML = '';
+
+            let count = 0;
+
+            achievements.forEach(item => {
+                const itemDateMonth = item.date.substring(0, 7);
+                const isLayerActive = activeLayers.has(item.category);
+                const isDateInRange = itemDateMonth >= startDate && itemDateMonth <= endDate;
+
+                if (isLayerActive && isDateInRange) {
+                    count++;
+                    // Add Marker to map
+                    addMarkerToMap(item);
+
+                    // Add Card to Sidebar
+                    const card = document.createElement('div');
+                    card.className = "p-2.5 bg-white border rounded-lg shadow-sm hover:shadow-md transition text-xs flex justify-between items-start gap-2";
+                    card.innerHTML = `
+                        <div class="flex-1 cursor-pointer" onclick="focusOnMap(${item.lat}, ${item.lng})">
+                            <div class="font-bold text-gray-800 hover:text-blue-600">${item.title}</div>
+                            <div class="text-[11px] text-gray-500 flex items-center gap-1 mt-1">
+                                <span class="px-1.5 py-0.5 rounded text-white text-[9px]" style="background-color: ${LAYERS_CONFIG[item.category]?.color || '#333'}">${item.category}</span>
+                                <span>• ${item.date}</span>
+                            </div>
+                        </div>
+                        <div class="flex gap-1">
+                            <button onclick="editAchievement('${item.id}')" class="text-blue-600 hover:bg-blue-50 p-1 rounded" title="تعديل"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="deleteAchievement('${item.id}')" class="text-red-600 hover:bg-red-50 p-1 rounded" title="حذف"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    `;
+                    listContainer.appendChild(card);
+                }
+            });
+
+            document.getElementById('totalCount').textContent = count;
+            document.getElementById('activeLayersCount').textContent = activeLayers.size;
+        }
+
+        function createCustomIcon(color, iconClass) {
+            return L.divIcon({
+                className: 'custom-div-icon',
+                html: `<div style="background-color:${color}; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-center:center; border:2px solid white; box-shadow:0 2px 5px rgba(0,0,0,0.4); color:white; font-size:12px;">
+                        <i class="fa-solid ${iconClass}" style="margin:auto;"></i>
+                       </div>`,
+                iconSize: [28, 28],
+                iconAnchor: [14, 14]
+            });
+        }
+
+        function addMarkerToMap(item) {
+            const config = LAYERS_CONFIG[item.category] || { color: '#333', icon: 'fa-location-dot' };
+            const icon = createCustomIcon(config.color, config.icon);
+
+            const marker = L.marker([item.lat, item.lng], { icon: icon });
+
+            const popupHtml = `
+                <div class="space-y-2">
+                    <img src="${item.image}" onerror="this.src='https://via.placeholder.com/300x150?text=لا+توجد+صورة'" class="w-full h-28 object-cover rounded-lg border">
+                    <h4 class="font-bold text-sm text-gray-900">${item.title}</h4>
+                    <span class="inline-block text-[10px] px-2 py-0.5 rounded text-white font-semibold" style="background-color: ${config.color}">${item.category}</span>
+                    <p class="text-xs text-gray-600">${item.description || 'لا يوجد وصف متاح.'}</p>
+                    <div class="text-[10px] text-gray-400 border-t pt-1 flex justify-between items-center">
+                        <span>تاريخ: ${item.date}</span>
+                        <button onclick="deleteAchievement('${item.id}')" class="text-red-500 hover:underline">حذف</button>
+                    </div>
+                </div>
+            `;
+
+            marker.bindPopup(popupHtml);
+            markersGroup[item.category].addLayer(marker);
+        }
+
+        function focusOnMap(lat, lng) {
+            map.flyTo([lat, lng], 17, { duration: 1 });
+        }
+
+        function toggleLayer(cat) {
+            if (activeLayers.has(cat)) {
+                activeLayers.delete(cat);
+            } else {
+                activeLayers.add(cat);
+            }
+            updateUI();
+        }
+
+        function toggleAllLayers(enable) {
+            if (enable) {
+                activeLayers = new Set(Object.keys(LAYERS_CONFIG));
+            } else {
+                activeLayers.clear();
+            }
+            renderLayerControls();
+            updateUI();
+        }
+
+        function setupEventListeners() {
+            document.getElementById('startDate').addEventListener('change', updateUI);
+            document.getElementById('endDate').addEventListener('change', updateUI);
+            
+            document.getElementById('toggleAddModalBtn').addEventListener('click', () => {
+                openModal(true);
+            });
+
+            document.getElementById('achievementForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                saveAchievementFromForm();
+            });
+        }
+
+        function openModal(isNew = true) {
+            if (isNew) {
+                document.getElementById('achievementForm').reset();
+                document.getElementById('editId').value = '';
+                document.getElementById('modalTitle').textContent = 'إضافة إنجاز جديد';
+                document.getElementById('lat').value = map.getCenter().lat.toFixed(6);
+                document.getElementById('lng').value = map.getCenter().lng.toFixed(6);
+            }
+            document.getElementById('addModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('addModal').classList.add('hidden');
+        }
+
+        function enableMapPick() {
+            closeModal();
+            isPickingLocation = true;
+            document.getElementById('clickNotice').classList.remove('hidden');
+        }
+
+        function cancelMapClick() {
+            isPickingLocation = false;
+            document.getElementById('clickNotice').classList.add('hidden');
+        }
+
+        function disableMapPick() {
+            isPickingLocation = false;
+            document.getElementById('clickNotice').classList.add('hidden');
+        }
+
+        function saveAchievementFromForm() {
+            const editId = document.getElementById('editId').value;
+            const newItem = {
+                id: editId || Date.now().toString(),
+                title: document.getElementById('title').value,
+                category: document.getElementById('layerCategory').value,
+                date: document.getElementById('achievementDate').value,
+                lat: parseFloat(document.getElementById('lat').value),
+                lng: parseFloat(document.getElementById('lng').value),
+                image: document.getElementById('imagePath').value,
+                description: document.getElementById('description').value
+            };
+
+            if (editId) {
+                const index = achievements.findIndex(a => a.id === editId);
+                if (index !== -1) achievements[index] = newItem;
+            } else {
+                achievements.unshift(newItem);
+            }
+
+            saveData();
+            closeModal();
+        }
+
+        function editAchievement(id) {
+            const item = achievements.find(a => a.id === id);
+            if (!item) return;
+
+            document.getElementById('editId').value = item.id;
+            document.getElementById('title').value = item.title;
+            document.getElementById('layerCategory').value = item.category;
+            document.getElementById('achievementDate').value = item.date;
+            document.getElementById('lat').value = item.lat;
+            document.getElementById('lng').value = item.lng;
+            document.getElementById('imagePath').value = item.image;
+            document.getElementById('description').value = item.description;
+
+            document.getElementById('modalTitle').textContent = 'تعديل الإنجاز';
+            openModal(false);
+        }
+
+        function deleteAchievement(id) {
+            if (confirm('هل أنت تأكد من حذف هذا الإنجاز؟')) {
+                achievements = achievements.filter(a => a.id !== id);
+                saveData();
+            }
+        }
+
+        // Export data to JSON file
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(achievements, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "achievements_data.json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        // Import data from JSON file
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (Array.isArray(imported)) {
+                        achievements = imported;
+                        saveData();
+                        alert('تم استيراد البيانات بنجاح!');
+                    } else {
+                        alert('تنسيق الملف غير صحيح.');
+                    }
+                } catch (err) {
+                    alert('خطأ في قراءة ملف JSON.');
+                }
+            };
+            reader.readAsText(file);
+        }
+    </script>
+</body>
+</html>
