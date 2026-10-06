@@ -681,7 +681,7 @@
                         <div class="form-group">
                             <label>اسم ملف الصورة (مجلد Image/) *</label>
                             <input type="text" class="form-control" id="form-image" placeholder="Image/building1.jpg" required>
-                            <span style="font-size: 0.7rem; color: var(--text-muted);">ضغ الصور في مجلد باسم Image بجانب ملف index.html</span>
+                            <span style="font-size: 0.7rem; color: var(--text-muted);">ضع الصور في مجلد باسم Image بجانب ملف index.html</span>
                         </div>
                     </div>
 
@@ -751,12 +751,14 @@
         let activeLayers = new Set(LAYERS_CONFIG.map(l => l.id));
         let mapMarkers = {};
 
-        // Base Map Tile Layers (Using Stable Public Services)
+        // Base Map Tile Layers (Using Stable Free Public Tile Servers)
         const TILE_SERVERS = {
-            streets: L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-                maxZoom: 19
+            // OpenStreetMap HOT Layer (Free, Reliable, No API Key Required)
+            streets: L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap contributors, Tiles style by Humanitarian OpenStreetMap Team'
             }),
+            // Esri Satellite View
             satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
                 attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
                 maxZoom: 18
