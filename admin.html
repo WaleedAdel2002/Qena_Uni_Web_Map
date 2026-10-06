@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم - إدارة إنجازات الجامعة</title>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <!-- Google Fonts (Cairo) -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #1e3a8a;
+            --primary-hover: #1d4ed8;
+            --accent-color: #f59e0b;
+            --danger-color: #ef4444;
+            --success-color: #10b981;
+            --bg-light: #f8fafc;
+            --panel-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --sidebar-width: 400px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            background-color: var(--bg-light);
+            color: var(--text-main);
+        }
+
+        /* Top Header Navigation */
+        .top-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .brand-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-title i {
+            font-size: 1.5rem;
+            color: #f59e0b;
+        }
+
+        .brand-title h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .admin-badge {
+            font-size: 0.75rem;
+            background: #ef4444;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: 700;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-export-json {
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.88rem;
+            transition: background 0.2s;
+        }
+
+        .btn-export-json:hover {
+            background-color: #059669;
+        }
+
+        .btn-import-json {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.88rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-add-achievement {
+            background-color: var(--primary-hover);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.88rem;
+        }
+
+        /* App Container */
+        .app-container {
+            display: flex;
+            width: 100%;
+            height: calc(100vh - 60px);
+            margin-top: 60px;
+            position: relative;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--panel-bg);
+            border-left: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            z-index: 900;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            background: #f8fafc;
+        }
+
+        .stats-card {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .stat-box {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .stat-box .number {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--primary-color);
+        }
+
+        .stat-box .label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .section-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .achievements-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .achievement-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .achievement-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .achievement-card .title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 4px;
+        }
+
+        .achievement-card .meta {
+            display: flex;
+            gap: 12px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .achievement-card .actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 8px;
+            padding-top: 6px;
+            border-top: 1px dashed var(--border-color);
+        }
+
+        .btn-action {
+            border: none;
+            background: transparent;
+            font-size: 0.8rem;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .btn-action.edit { color: var(--primary-color); }
+        .btn-action.edit:hover { background: #eff6ff; }
+        .btn-action.delete { color: var(--danger-color); }
+        .btn-action.delete:hover { background: #fef2f2; }
+
+        #map {
+            flex: 1;
+            height: 100%;
+            background: #e2e8f0;
+        }
+
+        /* Modal Form */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active { display: flex; }
+
+        .modal-content {
+            background: white;
+            width: 100%;
+            max-width: 520px;
+            border-radius: 12px;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .modal-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-header h3 { font-size: 1.1rem; font-weight: 700; }
+
+        .btn-close {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .modal-body {
+            padding: 20px;
+            max-height: 75vh;
+            overflow-y: auto;
+        }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .form-grid.full { grid-template-columns: 1fr; }
+
+        .form-group { margin-bottom: 12px; }
+        .form-group label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px; }
+        .form-control { width: 100%; padding: 8px 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.85rem; outline: none; }
+
+        .modal-footer {
+            padding: 12px 20px;
+            background: #f8fafc;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn-secondary { background: #e2e8f0; color: var(--text-main); border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; }
+        .btn-primary { background: var(--primary-color); color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; }
+
+        .popup-card { width: 240px; }
+        .popup-card img { width: 100%; height: 130px; object-fit: cover; border-radius: 6px; margin-bottom: 8px; }
+        .popup-card h4 { font-size: 0.95rem; color: var(--primary-color); margin-bottom: 4px; }
+        .popup-card p { font-size: 0.8rem; color: #334155; margin-bottom: 8px; }
+        .popup-card .date { font-size: 0.75rem; color: var(--text-muted); }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header class="top-header">
+        <div class="brand-title">
+            <i class="fa-solid fa-user-gear"></i>
+            <div>
+                <h1>لوحة التحكم والإدارة</h1>
+            </div>
+            <span class="admin-badge">ADMIN</span>
+        </div>
+
+        <div class="header-controls">
+            <button class="btn-import-json" onclick="document.getElementById('import-file').click()">
+                <i class="fa-solid fa-file-import"></i> فتح ملف data.json القائم
+            </button>
+            <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importData(event)">
+
+            <button class="btn-export-json" onclick="exportData()">
+                <i class="fa-solid fa-file-export"></i> تصدير data.json الجديد
+            </button>
+
+            <button class="btn-add-achievement" onclick="openAddModal()">
+                <i class="fa-solid fa-plus"></i> إضافة إنجاز
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="app-container">
+        
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="stats-card">
+                    <div class="stat-box">
+                        <div class="number" id="total-count">0</div>
+                        <div class="label">إجمالي الإنجازات</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="number" id="active-layers-count">11</div>
+                        <div class="label">إجمالي الطبقات</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-content">
+                <div class="section-title">
+                    <span><i class="fa-solid fa-list-check"></i> إدارة النقاط والإنجازات</span>
+                </div>
+                <div class="achievements-list" id="achievements-container">
+                    <!-- Achievements List Injected Here -->
+                </div>
+            </div>
+        </aside>
+
+        <!-- Map Canvas -->
+        <main id="map"></main>
+
+    </div>
+
+    <!-- Modal Form (Add / Edit) -->
+    <div class="modal" id="achievement-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">إضافة إنجاز جديد</h3>
+                <button class="btn-close" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="achievement-form" onsubmit="saveAchievement(event)">
+                <div class="modal-body">
+                    <input type="hidden" id="achievement-id">
+                    
+                    <div class="form-grid full">
+                        <div class="form-group">
+                            <label>عنوان الإنجاز / المشروع *</label>
+                            <input type="text" class="form-control" id="form-title" required placeholder="مثال: إنشاء معمل الفيزياء الجديد">
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>الطبقة / التصنيف *</label>
+                            <select class="form-control" id="form-layer" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label>تاريخ الإنجاز *</label>
+                            <input type="date" class="form-control" id="form-date" min="2023-07-01" max="2026-08-31" required>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>خط العرض (Latitude) *</label>
+                            <input type="number" step="any" class="form-control" id="form-lat" required placeholder="26.155">
+                        </div>
+                        <div class="form-group">
+                            <label>خط الطول (Longitude) *</label>
+                            <input type="number" step="any" class="form-control" id="form-lng" required placeholder="32.721">
+                        </div>
+                    </div>
+
+                    <div class="form-grid full">
+                        <div class="form-group">
+                            <label>مسار ملف الصورة (داخل مجلد Image/) *</label>
+                            <input type="text" class="form-control" id="form-image" placeholder="Image/building1.jpg" required>
+                        </div>
+                    </div>
+
+                    <div class="form-grid full">
+                        <div class="form-group">
+                            <label>وصف وتفاصيل الإنجاز</label>
+                            <textarea class="form-control" id="form-description" rows="3" placeholder="أدخل الوصف التفصيلي للإنجاز..."></textarea>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeModal()">إلغاء</button>
+                    <button type="submit" class="btn-primary">حفظ الإنجاز</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        const LAYERS_CONFIG = [
+            { id: 'construction', name: 'الإنشاءات والصيانة', color: '#ef4444', icon: 'fa-building' },
+            { id: 'infrastructure', name: 'البنية التحتية', color: '#f59e0b', icon: 'fa-network-wired' },
+            { id: 'education', name: 'البيئة التعليمية', color: '#10b981', icon: 'fa-graduation-cap' },
+            { id: 'logistics', name: 'الخدمات اللوجستية', color: '#3b82f6', icon: 'fa-truck-ramp-box' },
+            { id: 'roads', name: 'الطرق والبوابات', color: '#8b5cf6', icon: 'fa-road' },
+            { id: 'general_site', name: 'الموقع العام', color: '#ec4899', icon: 'fa-map-location-dot' },
+            { id: 'organizational', name: 'قائمة الأدلة التنظيمية', color: '#6366f1', icon: 'fa-book' },
+            { id: 'digital_transform', name: 'قائمة التحول الرقمي', color: '#14b8a6', icon: 'fa-laptop-code' },
+            { id: 'engineering_projects', name: 'قائمة المشروعات الهندسة', color: '#84cc16', icon: 'fa-compass-drafting' },
+            { id: 'car_shades', name: 'قائمة مظلات السيارات', color: '#64748b', icon: 'fa-square-parking' },
+            { id: 'student_shades', name: 'قائمة مظلات الطلاب', color: '#06b6d4', icon: 'fa-umbrella' }
+        ];
+
+        let map, achievements = [];
+        let mapMarkers = {};
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initMap();
+            renderLayerSelectOptions();
+            loadAchievementsFromJSON();
+        });
+
+        function initMap() {
+            map = L.map('map', { center: [26.155, 32.721], zoom: 15, zoomControl: false });
+            L.control.zoom({ position: 'bottomleft' }).addTo(map);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap'
+            }).addTo(map);
+
+            map.on('click', (e) => {
+                openAddModal(e.latlng.lat, e.latlng.lng);
+            });
+        }
+
+        function loadAchievementsFromJSON() {
+            fetch('data.json')
+                .then(response => response.json())
+                .then(data => {
+                    achievements = data;
+                    renderAchievementsList();
+                    updateMapMarkers();
+                })
+                .catch(err => {
+                    console.log('لم يتم العثور على data.json تلقائياً، يمكنك استيراد الملف يدوياً.');
+                });
+        }
+
+        function renderLayerSelectOptions() {
+            const select = document.getElementById('form-layer');
+            select.innerHTML = LAYERS_CONFIG.map(l => `<option value="${l.id}">${l.name}</option>`).join('');
+        }
+
+        function renderAchievementsList() {
+            const container = document.getElementById('achievements-container');
+            container.innerHTML = '';
+            document.getElementById('total-count').innerText = achievements.length;
+
+            achievements.forEach(item => {
+                const layer = LAYERS_CONFIG.find(l => l.id === item.layerId);
+                const card = document.createElement('div');
+                card.className = 'achievement-card';
+                card.onclick = () => focusOnMap(item.id);
+
+                card.innerHTML = `
+                    <div class="title">${item.title}</div>
+                    <div class="meta">
+                        <span><i class="fa-solid fa-tag"></i> ${layer ? layer.name : ''}</span>
+                        <span><i class="fa-regular fa-calendar"></i> ${item.date}</span>
+                    </div>
+                    <div class="actions" onclick="event.stopPropagation()">
+                        <button class="btn-action edit" onclick="openEditModal('${item.id}')"><i class="fa-solid fa-pen"></i> تعديل</button>
+                        <button class="btn-action delete" onclick="deleteAchievement('${item.id}')"><i class="fa-solid fa-trash"></i> حذف</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function updateMapMarkers() {
+            Object.values(mapMarkers).forEach(m => map.removeLayer(m));
+            mapMarkers = {};
+
+            achievements.forEach(item => {
+                const layer = LAYERS_CONFIG.find(l => l.id === item.layerId);
+                const color = layer ? layer.color : '#1e3a8a';
+
+                const customIcon = L.divIcon({
+                    className: 'custom-map-pin',
+                    html: `<div style="background-color: ${color}; width: 28px; height: 28px; border-radius: 50%; border: 3px solid white; box-shadow: 0 3px 8px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; color: white; font-size: 12px;"><i class="fa-solid ${layer ? layer.icon : 'fa-location-dot'}"></i></div>`,
+                    iconSize: [28, 28],
+                    iconAnchor: [14, 14]
+                });
+
+                const marker = L.marker([item.lat, item.lng], { icon: customIcon }).addTo(map);
+                const popupHTML = `
+                    <div class="popup-card">
+                        <img src="${item.image}" alt="${item.title}" onerror="this.src='https://via.placeholder.com/240x130?text=لا+توجد+صورة';">
+                        <h4>${item.title}</h4>
+                        <p>${item.description || ''}</p>
+                        <div class="date"><i class="fa-regular fa-calendar"></i> ${item.date}</div>
+                    </div>
+                `;
+                marker.bindPopup(popupHTML);
+                mapMarkers[item.id] = marker;
+            });
+        }
+
+        function focusOnMap(id) {
+            const item = achievements.find(a => a.id === id);
+            if (item && mapMarkers[id]) {
+                map.setView([item.lat, item.lng], 17, { animate: true });
+                mapMarkers[id].openPopup();
+            }
+        }
+
+        function openAddModal(lat = '', lng = '') {
+            document.getElementById('modal-title').innerText = 'إضافة إنجاز جديد';
+            document.getElementById('achievement-id').value = '';
+            document.getElementById('achievement-form').reset();
+            document.getElementById('form-date').value = new Date().toISOString().split('T')[0];
+
+            if (lat && lng) {
+                document.getElementById('form-lat').value = parseFloat(lat).toFixed(6);
+                document.getElementById('form-lng').value = parseFloat(lng).toFixed(6);
+            } else {
+                document.getElementById('form-lat').value = '26.155';
+                document.getElementById('form-lng').value = '32.721';
+            }
+
+            document.getElementById('achievement-modal').classList.add('active');
+        }
+
+        function openEditModal(id) {
+            const item = achievements.find(a => a.id === id);
+            if (!item) return;
+
+            document.getElementById('modal-title').innerText = 'تعديل بيانات الإنجاز';
+            document.getElementById('achievement-id').value = item.id;
+            document.getElementById('form-title').value = item.title;
+            document.getElementById('form-layer').value = item.layerId;
+            document.getElementById('form-date').value = item.date;
+            document.getElementById('form-lat').value = item.lat;
+            document.getElementById('form-lng').value = item.lng;
+            document.getElementById('form-image').value = item.image;
+            document.getElementById('form-description').value = item.description || '';
+
+            document.getElementById('achievement-modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('achievement-modal').classList.remove('active');
+        }
+
+        function saveAchievement(e) {
+            e.preventDefault();
+
+            const id = document.getElementById('achievement-id').value;
+            const title = document.getElementById('form-title').value;
+            const layerId = document.getElementById('form-layer').value;
+            const date = document.getElementById('form-date').value;
+            const lat = parseFloat(document.getElementById('form-lat').value);
+            const lng = parseFloat(document.getElementById('form-lng').value);
+            const image = document.getElementById('form-image').value || 'Image/default.jpg';
+            const description = document.getElementById('form-description').value;
+
+            if (id) {
+                const index = achievements.findIndex(a => a.id === id);
+                if (index !== -1) achievements[index] = { id, title, layerId, date, lat, lng, image, description };
+            } else {
+                const newId = 'ach_' + Date.now();
+                achievements.push({ id: newId, title, layerId, date, lat, lng, image, description });
+            }
+
+            renderAchievementsList();
+            updateMapMarkers();
+            closeModal();
+        }
+
+        function deleteAchievement(id) {
+            if (confirm('هل أنت تأكد من إزالة هذا الإنجاز؟')) {
+                achievements = achievements.filter(a => a.id !== id);
+                renderAchievementsList();
+                updateMapMarkers();
+            }
+        }
+
+        // Export data directly as "data.json"
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(achievements, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "data.json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function importData(event) {
+            const fileReader = new FileReader();
+            fileReader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if (Array.isArray(parsed)) {
+                        achievements = parsed;
+                        renderAchievementsList();
+                        updateMapMarkers();
+                        alert('تم تحميل البيانات بنجاح!');
+                    }
+                } catch (err) {
+                    alert('الملف المرفق غير صالح.');
+                }
+            };
+            fileReader.readAsText(event.target.files[0]);
+        }
+    </script>
+</body>
+</html>

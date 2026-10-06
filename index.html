@@ -4,20 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>خريطة إنجازات الجامعة (2023 - 2026)</title>
-    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <!-- Google Fonts (Cairo) -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     
     <style>
         :root {
             --primary-color: #1e3a8a;
-            --primary-hover: #1d4ed8;
-            --secondary-color: #0d9488;
-            --accent-color: #f59e0b;
-            --danger-color: #ef4444;
             --bg-light: #f8fafc;
             --panel-bg: #ffffff;
             --text-main: #0f172a;
@@ -26,516 +19,67 @@
             --sidebar-width: 380px;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Cairo', sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
+        body { display: flex; height: 100vh; overflow: hidden; background-color: var(--bg-light); color: var(--text-main); }
 
-        body {
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-            background-color: var(--bg-light);
-            color: var(--text-main);
-        }
-
-        /* Top Header Navigation */
         .top-header {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 60px;
+            position: absolute; top: 0; left: 0; right: 0; height: 60px;
             background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 20px;
-            z-index: 1000;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            color: white; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
-        .brand-title {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+        .brand-title { display: flex; align-items: center; gap: 12px; }
+        .brand-title i { font-size: 1.5rem; color: #38bdf8; }
+        .brand-title h1 { font-size: 1.25rem; font-weight: 700; }
+        .brand-title span { font-size: 0.8rem; background: rgba(255,255,255,0.15); padding: 2px 8px; border-radius: 12px; color: #e0f2fe; margin-right: 8px; }
 
-        .brand-title i {
-            font-size: 1.5rem;
-            color: #38bdf8;
-        }
+        .header-controls { display: flex; align-items: center; gap: 12px; }
+        .map-type-selector { background: rgba(255, 255, 255, 0.1); padding: 4px; border-radius: 8px; display: flex; gap: 4px; border: 1px solid rgba(255, 255, 255, 0.2); }
+        .map-type-btn { background: transparent; border: none; color: #e2e8f0; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+        .map-type-btn.active { background: #ffffff; color: var(--primary-color); }
 
-        .brand-title h1 {
-            font-size: 1.25rem;
-            font-weight: 700;
-        }
+        .app-container { display: flex; width: 100%; height: calc(100vh - 60px); margin-top: 60px; position: relative; }
+        .sidebar { width: var(--sidebar-width); background: var(--panel-bg); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; z-index: 900; overflow: hidden; }
+        .sidebar-header { padding: 16px 20px; border-bottom: 1px solid var(--border-color); background: #f8fafc; }
+        
+        .stats-card { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .stat-box { background: white; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); text-align: center; }
+        .stat-box .number { font-size: 1.4rem; font-weight: 800; color: var(--primary-color); }
+        .stat-box .label { font-size: 0.75rem; color: var(--text-muted); }
 
-        .brand-title span {
-            font-size: 0.8rem;
-            background: rgba(255,255,255,0.15);
-            padding: 2px 8px;
-            border-radius: 12px;
-            color: #e0f2fe;
-            margin-right: 8px;
-        }
+        .sidebar-content { flex: 1; overflow-y: auto; padding: 20px; }
+        .section-title { font-size: 0.95rem; font-weight: 700; color: var(--text-main); margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
 
-        /* Map Switcher Controls in Header */
-        .header-controls {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+        .layers-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
+        .layer-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 6px; }
+        .layer-info { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; font-weight: 600; }
+        .layer-color { width: 12px; height: 12px; border-radius: 50%; }
 
-        .map-type-selector {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 4px;
-            border-radius: 8px;
-            display: flex;
-            gap: 4px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
+        .filter-box { background: #f8fafc; border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; margin-bottom: 24px; }
+        .date-inputs { display: flex; gap: 10px; }
+        .form-group { flex: 1; }
+        .form-group label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px; }
+        .form-control { width: 100%; padding: 8px 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.85rem; }
 
-        .map-type-btn {
-            background: transparent;
-            border: none;
-            color: #e2e8f0;
-            padding: 6px 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.2s ease;
-        }
+        .achievements-list { display: flex; flex-direction: column; gap: 10px; }
+        .achievement-card { background: white; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; cursor: pointer; transition: all 0.2s; }
+        .achievement-card:hover { border-color: var(--primary-color); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .achievement-card .title { font-size: 0.9rem; font-weight: 700; color: var(--primary-color); margin-bottom: 4px; }
+        .achievement-card .meta { display: flex; gap: 12px; font-size: 0.75rem; color: var(--text-muted); }
 
-        .map-type-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-            color: white;
-        }
+        #map { flex: 1; height: 100%; background: #e2e8f0; }
 
-        .map-type-btn.active {
-            background: #ffffff;
-            color: var(--primary-color);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .btn-add-achievement {
-            background-color: #10b981;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: background 0.2s;
-            font-size: 0.88rem;
-        }
-
-        .btn-add-achievement:hover {
-            background-color: #059669;
-        }
-
-        /* Main Layout */
-        .app-container {
-            display: flex;
-            width: 100%;
-            height: calc(100vh - 60px);
-            margin-top: 60px;
-            position: relative;
-        }
-
-        /* Sidebar Styling */
-        .sidebar {
-            width: var(--sidebar-width);
-            background: var(--panel-bg);
-            border-left: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            z-index: 900;
-            box-shadow: -2px 0 10px rgba(0,0,0,0.05);
-            overflow: hidden;
-            transition: transform 0.3s ease;
-        }
-
-        .sidebar-header {
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border-color);
-            background: #f8fafc;
-        }
-
-        .stats-card {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .stat-box {
-            background: white;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            text-align: center;
-        }
-
-        .stat-box .number {
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: var(--primary-color);
-        }
-
-        .stat-box .label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        .sidebar-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-        }
-
-        .section-title {
-            font-size: 0.95rem;
-            font-weight: 700;
-            color: var(--text-main);
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        /* Layer List */
-        .layers-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 24px;
-        }
-
-        .layer-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 8px 12px;
-            background: #f8fafc;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .layer-item:hover {
-            background: #f1f5f9;
-        }
-
-        .layer-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-
-        .layer-color {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            display: inline-block;
-        }
-
-        .layer-item input[type="checkbox"] {
-            cursor: pointer;
-            width: 16px;
-            height: 16px;
-            accent-color: var(--primary-color);
-        }
-
-        /* Date Range Filter */
-        .filter-box {
-            background: #f8fafc;
-            border: 1px solid var(--border-color);
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 24px;
-        }
-
-        .date-inputs {
-            display: flex;
-            gap: 10px;
-        }
-
-        .form-group {
-            flex: 1;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-bottom: 4px;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 8px 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 0.85rem;
-            outline: none;
-            background: white;
-        }
-
-        .form-control:focus {
-            border-color: var(--primary-color);
-        }
-
-        /* Achievements List in Sidebar */
-        .achievements-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .achievement-card {
-            background: white;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-            position: relative;
-        }
-
-        .achievement-card:hover {
-            border-color: var(--primary-color);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            transform: translateY(-1px);
-        }
-
-        .achievement-card .title {
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin-bottom: 4px;
-        }
-
-        .achievement-card .meta {
-            display: flex;
-            gap: 12px;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-        }
-
-        .achievement-card .actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 8px;
-            margin-top: 8px;
-            padding-top: 6px;
-            border-top: 1px dashed var(--border-color);
-        }
-
-        .btn-action {
-            border: none;
-            background: transparent;
-            font-size: 0.8rem;
-            cursor: pointer;
-            padding: 4px 8px;
-            border-radius: 4px;
-            transition: background 0.2s;
-        }
-
-        .btn-action.edit { color: var(--primary-color); }
-        .btn-action.edit:hover { background: #eff6ff; }
-        .btn-action.delete { color: var(--danger-color); }
-        .btn-action.delete:hover { background: #fef2f2; }
-
-        /* Map Canvas */
-        #map {
-            flex: 1;
-            height: 100%;
-            background: #e2e8f0;
-            z-index: 1;
-        }
-
-        /* Modal Overlay & Form */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(4px);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: white;
-            width: 100%;
-            max-width: 520px;
-            border-radius: 12px;
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
-            overflow: hidden;
-            animation: modalSlide 0.3s ease;
-        }
-
-        @keyframes modalSlide {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .modal-header {
-            background: var(--primary-color);
-            color: white;
-            padding: 16px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .modal-header h3 {
-            font-size: 1.1rem;
-            font-weight: 700;
-        }
-
-        .btn-close {
-            background: transparent;
-            border: none;
-            color: white;
-            font-size: 1.2rem;
-            cursor: pointer;
-        }
-
-        .modal-body {
-            padding: 20px;
-            max-height: 75vh;
-            overflow-y: auto;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .form-grid.full {
-            grid-template-columns: 1fr;
-        }
-
-        .modal-footer {
-            padding: 12px 20px;
-            background: #f8fafc;
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-        }
-
-        .btn-secondary {
-            background: #e2e8f0;
-            color: var(--text-main);
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .btn-primary {
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        /* Popup Image Styling */
-        .popup-card {
-            width: 240px;
-        }
-
-        .popup-card img {
-            width: 100%;
-            height: 130px;
-            object-fit: cover;
-            border-radius: 6px;
-            margin-bottom: 8px;
-            background: #f1f5f9;
-        }
-
-        .popup-card h4 {
-            font-size: 0.95rem;
-            color: var(--primary-color);
-            margin-bottom: 4px;
-        }
-
-        .popup-card .layer-tag {
-            display: inline-block;
-            font-size: 0.7rem;
-            padding: 2px 6px;
-            border-radius: 4px;
-            background: #e0f2fe;
-            color: #0369a1;
-            margin-bottom: 6px;
-            font-weight: 600;
-        }
-
-        .popup-card p {
-            font-size: 0.8rem;
-            color: #334155;
-            margin-bottom: 8px;
-            line-height: 1.4;
-        }
-
-        .popup-card .date {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .sidebar {
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                width: 100%;
-                height: 50%;
-                transform: translateY(100%);
-            }
-            .sidebar.mobile-open {
-                transform: translateY(0);
-            }
-        }
+        .popup-card { width: 240px; }
+        .popup-card img { width: 100%; height: 130px; object-fit: cover; border-radius: 6px; margin-bottom: 8px; }
+        .popup-card h4 { font-size: 0.95rem; color: var(--primary-color); margin-bottom: 4px; }
+        .popup-card .layer-tag { display: inline-block; font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; margin-bottom: 6px; font-weight: 600; }
+        .popup-card p { font-size: 0.8rem; color: #334155; margin-bottom: 8px; line-height: 1.4; }
+        .popup-card .date { font-size: 0.75rem; color: var(--text-muted); }
     </style>
 </head>
 <body>
 
-    <!-- Header Navigation -->
     <header class="top-header">
         <div class="brand-title">
             <i class="fa-solid fa-graduation-cap"></i>
@@ -545,7 +89,6 @@
             </div>
         </div>
 
-        <!-- Top Map Mode Switcher -->
         <div class="header-controls">
             <div class="map-type-selector">
                 <button class="map-type-btn active" id="btn-streets" onclick="switchMapLayer('streets')">
@@ -555,16 +98,10 @@
                     <i class="fa-solid fa-satellite"></i> صورة جوية / موقع
                 </button>
             </div>
-            <button class="btn-add-achievement" onclick="openAddModal()">
-                <i class="fa-solid fa-plus"></i> إضافة إنجاز
-            </button>
         </div>
     </header>
 
-    <!-- Main Container -->
     <div class="app-container">
-        
-        <!-- Sidebar Controls & Data List -->
         <aside class="sidebar">
             <div class="sidebar-header">
                 <div class="stats-card">
@@ -580,29 +117,12 @@
             </div>
 
             <div class="sidebar-content">
-                
-                <!-- Data Import / Export Buttons -->
-                <div style="display: flex; gap: 8px; margin-bottom: 16px;">
-                    <button class="btn-secondary" style="flex: 1; font-size: 0.78rem;" onclick="exportData()">
-                        <i class="fa-solid fa-download"></i> تصدير JSON
-                    </button>
-                    <button class="btn-secondary" style="flex: 1; font-size: 0.78rem;" onclick="document.getElementById('import-file').click()">
-                        <i class="fa-solid fa-upload"></i> استيراد
-                    </button>
-                    <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importData(event)">
-                </div>
-
-                <!-- Layer Manager Section -->
                 <div class="section-title">
                     <span><i class="fa-solid fa-layer-group"></i> طبقات الإنجازات</span>
                     <button style="background:none; border:none; color:var(--primary-color); cursor:pointer; font-size:0.75rem;" onclick="toggleAllLayers(true)">تحديد الكل</button>
                 </div>
-                
-                <div class="layers-list" id="layers-container">
-                    <!-- Dynamic Layer Items Injected Here -->
-                </div>
+                <div class="layers-list" id="layers-container"></div>
 
-                <!-- Date Range Filter -->
                 <div class="section-title">
                     <span><i class="fa-solid fa-filter"></i> تصفية حسب الفترة الزمنية</span>
                 </div>
@@ -619,93 +139,19 @@
                     </div>
                 </div>
 
-                <!-- Achievements Recorded List -->
                 <div class="section-title">
                     <span><i class="fa-solid fa-list-check"></i> قائمة الإنجازات المسجلة</span>
                 </div>
-                <div class="achievements-list" id="achievements-container">
-                    <!-- Dynamic Achievements List Injected Here -->
-                </div>
-
+                <div class="achievements-list" id="achievements-container"></div>
             </div>
         </aside>
 
-        <!-- Interactive Map Canvas -->
         <main id="map"></main>
-
     </div>
 
-    <!-- Modal Form (Add / Edit Achievement) -->
-    <div class="modal" id="achievement-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="modal-title">إضافة إنجاز جديد</h3>
-                <button class="btn-close" onclick="closeModal()">&times;</button>
-            </div>
-            <form id="achievement-form" onsubmit="saveAchievement(event)">
-                <div class="modal-body">
-                    <input type="hidden" id="achievement-id">
-                    
-                    <div class="form-grid full" style="margin-bottom: 12px;">
-                        <div class="form-group">
-                            <label>عنوان الإنجاز / المشروع *</label>
-                            <input type="text" class="form-control" id="form-title" required placeholder="مثال: تطوير معامل كلية العلوم">
-                        </div>
-                    </div>
-
-                    <div class="form-grid" style="margin-bottom: 12px;">
-                        <div class="form-group">
-                            <label>الطبقة / التصنيف *</label>
-                            <select class="form-control" id="form-layer" required>
-                                <!-- Injected dynamically -->
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>تاريخ الإنجاز *</label>
-                            <input type="date" class="form-control" id="form-date" min="2023-07-01" max="2026-08-31" required>
-                        </div>
-                    </div>
-
-                    <div class="form-grid" style="margin-bottom: 12px;">
-                        <div class="form-group">
-                            <label>خط العرض (Latitude) *</label>
-                            <input type="number" step="any" class="form-control" id="form-lat" required placeholder="26.155">
-                        </div>
-                        <div class="form-group">
-                            <label>خط الطول (Longitude) *</label>
-                            <input type="number" step="any" class="form-control" id="form-lng" required placeholder="32.721">
-                        </div>
-                    </div>
-
-                    <div class="form-grid full" style="margin-bottom: 12px;">
-                        <div class="form-group">
-                            <label>اسم ملف الصورة (مجلد Image/) *</label>
-                            <input type="text" class="form-control" id="form-image" placeholder="Image/building1.jpg" required>
-                            <span style="font-size: 0.7rem; color: var(--text-muted);">ضع الصور في مجلد باسم Image بجانب ملف index.html</span>
-                        </div>
-                    </div>
-
-                    <div class="form-grid full">
-                        <div class="form-group">
-                            <label>وصف وتفاصيل الإنجاز</label>
-                            <textarea class="form-control" id="form-description" rows="3" placeholder="اكتب تفاصيل الإنجاز والمواصفات..."></textarea>
-                        </div>
-                    </div>
-
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn-secondary" onclick="closeModal()">إلغاء</button>
-                    <button type="submit" class="btn-primary">حفظ الإنجاز</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
-        // --- 1. Layers Configuration (Matching .docx Files) ---
         const LAYERS_CONFIG = [
             { id: 'construction', name: 'الإنشاءات والصيانة', color: '#ef4444', icon: 'fa-building' },
             { id: 'infrastructure', name: 'البنية التحتية', color: '#f59e0b', icon: 'fa-network-wired' },
@@ -720,116 +166,50 @@
             { id: 'student_shades', name: 'قائمة مظلات الطلاب', color: '#06b6d4', icon: 'fa-umbrella' }
         ];
 
-        // Default Initial Achievements Samples
-        const INITIAL_ACHIEVEMENTS = [
-            {
-                id: 'ach_1',
-                title: 'تطوير وتجهيز المبنى التعليمي الرئيسي',
-                layerId: 'education',
-                date: '2023-10-15',
-                lat: 26.1565,
-                lng: 32.7215,
-                image: 'Image/sample1.jpg',
-                description: 'إنشاء وتجهيز قاعات دراسية ومعامل حاسب ألي حديثة لخدمة أهداف البيئة التعليمية.'
-            },
-            {
-                id: 'ach_2',
-                title: 'إنشاء وتوسعة البوابة الشرقية والرئيسية',
-                layerId: 'roads',
-                date: '2024-03-20',
-                lat: 26.1540,
-                lng: 32.7240,
-                image: 'Image/sample2.jpg',
-                description: 'مشروع رصف الطرق الداخلية وتحديث منظومة بوابات الدخول الإلكترونية للجامعة.'
-            }
-        ];
-
-        // --- Application State ---
-        let map;
-        let activeTileLayer;
-        let achievements = [];
+        let map, activeTileLayer, achievements = [];
         let activeLayers = new Set(LAYERS_CONFIG.map(l => l.id));
         let mapMarkers = {};
 
-        // Base Map Tile Layers (Using Stable Free Public Tile Servers)
         const TILE_SERVERS = {
-            // OpenStreetMap HOT Layer (Free, Reliable, No API Key Required)
-            streets: L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '&copy; OpenStreetMap contributors, Tiles style by Humanitarian OpenStreetMap Team'
-            }),
-            // Esri Satellite View
-            satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-                attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
-                maxZoom: 18
-            })
+            streets: L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' }),
+            satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 18, attribution: '&copy; Esri' })
         };
 
-        // --- Initialize App ---
         document.addEventListener('DOMContentLoaded', () => {
             initMap();
-            loadAchievements();
-            renderLayerControls();
-            renderLayerSelectOptions();
-            renderAchievementsList();
-            updateMapMarkers();
+            loadAchievementsFromJSON();
         });
 
-        // Initialize Map
         function initMap() {
-            // Default center: South Valley University / Qena, Egypt coordinates
-            map = L.map('map', {
-                center: [26.155, 32.721],
-                zoom: 15,
-                zoomControl: false
-            });
-
+            map = L.map('map', { center: [26.155, 32.721], zoom: 15, zoomControl: false });
             L.control.zoom({ position: 'bottomleft' }).addTo(map);
-
-            // Set Initial Base Layer to Streets
             activeTileLayer = TILE_SERVERS.streets;
             activeTileLayer.addTo(map);
-
-            // Click on Map to add new point
-            map.on('click', (e) => {
-                openAddModal(e.latlng.lat, e.latlng.lng);
-            });
         }
 
-        // --- Switch Between Map Base Layers (Streets vs Satellite) ---
         function switchMapLayer(mode) {
-            if (activeTileLayer) {
-                map.removeLayer(activeTileLayer);
-            }
-
+            if (activeTileLayer) map.removeLayer(activeTileLayer);
             activeTileLayer = TILE_SERVERS[mode];
             activeTileLayer.addTo(map);
-
-            // Toggle button styling
             document.getElementById('btn-streets').classList.toggle('active', mode === 'streets');
             document.getElementById('btn-satellite').classList.toggle('active', mode === 'satellite');
         }
 
-        // --- Data Management (LocalStorage) ---
-        function loadAchievements() {
-            const stored = localStorage.getItem('univ_achievements');
-            if (stored) {
-                try {
-                    achievements = JSON.parse(stored);
-                } catch (e) {
-                    achievements = INITIAL_ACHIEVEMENTS;
-                }
-            } else {
-                achievements = INITIAL_ACHIEVEMENTS;
-                saveToLocalStorage();
-            }
+        // Fetch data automatically from data.json file
+        function loadAchievementsFromJSON() {
+            fetch('data.json')
+                .then(response => response.json())
+                .then(data => {
+                    achievements = data;
+                    renderLayerControls();
+                    renderAchievementsList();
+                    updateMapMarkers();
+                })
+                .catch(error => {
+                    console.error('Error loading data.json:', error);
+                });
         }
 
-        function saveToLocalStorage() {
-            localStorage.setItem('univ_achievements', JSON.stringify(achievements));
-        }
-
-        // --- Render UI Elements ---
         function renderLayerControls() {
             const container = document.getElementById('layers-container');
             container.innerHTML = '';
@@ -850,49 +230,31 @@
                 `;
                 container.appendChild(item);
             });
-
             document.getElementById('active-layers-count').innerText = activeLayers.size;
-        }
-
-        function renderLayerSelectOptions() {
-            const select = document.getElementById('form-layer');
-            select.innerHTML = LAYERS_CONFIG.map(l => `<option value="${l.id}">${l.name}</option>`).join('');
         }
 
         function renderAchievementsList() {
             const container = document.getElementById('achievements-container');
             container.innerHTML = '';
-
             const filtered = getFilteredAchievements();
             document.getElementById('total-count').innerText = filtered.length;
-
-            if (filtered.length === 0) {
-                container.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:20px;">لا توجد إنجازات مطابقة للفلتر</div>';
-                return;
-            }
 
             filtered.forEach(item => {
                 const layer = LAYERS_CONFIG.find(l => l.id === item.layerId);
                 const card = document.createElement('div');
                 card.className = 'achievement-card';
                 card.onclick = () => focusOnMap(item.id);
-
                 card.innerHTML = `
                     <div class="title">${item.title}</div>
                     <div class="meta">
                         <span><i class="fa-solid fa-tag"></i> ${layer ? layer.name : ''}</span>
                         <span><i class="fa-regular fa-calendar"></i> ${item.date}</span>
                     </div>
-                    <div class="actions" onclick="event.stopPropagation()">
-                        <button class="btn-action edit" onclick="openEditModal('${item.id}')"><i class="fa-solid fa-pen"></i> تعديل</button>
-                        <button class="btn-action delete" onclick="deleteAchievement('${item.id}')"><i class="fa-solid fa-trash"></i> حذف</button>
-                    </div>
                 `;
                 container.appendChild(card);
             });
         }
 
-        // --- Filter Achievements by Layer & Date ---
         function getFilteredAchievements() {
             const startDate = document.getElementById('filter-start-date').value;
             const endDate = document.getElementById('filter-end-date').value;
@@ -910,60 +272,36 @@
         }
 
         function toggleLayer(layerId, isChecked) {
-            if (isChecked) {
-                activeLayers.add(layerId);
-            } else {
-                activeLayers.delete(layerId);
-            }
+            if (isChecked) activeLayers.add(layerId);
+            else activeLayers.delete(layerId);
             renderLayerControls();
             filterData();
         }
 
         function toggleAllLayers(status) {
-            if (status) {
-                LAYERS_CONFIG.forEach(l => activeLayers.add(l.id));
-            } else {
-                activeLayers.clear();
-            }
+            if (status) LAYERS_CONFIG.forEach(l => activeLayers.add(l.id));
+            else activeLayers.clear();
             renderLayerControls();
             filterData();
         }
 
-        // --- Map Markers Rendering ---
         function updateMapMarkers() {
-            // Clear existing markers
             Object.values(mapMarkers).forEach(marker => map.removeLayer(marker));
             mapMarkers = {};
 
             const filtered = getFilteredAchievements();
-
             filtered.forEach(item => {
                 const layer = LAYERS_CONFIG.find(l => l.id === item.layerId);
                 const color = layer ? layer.color : '#1e3a8a';
 
-                // Custom SVG Marker Icon
                 const customIcon = L.divIcon({
                     className: 'custom-map-pin',
-                    html: `<div style="
-                        background-color: ${color};
-                        width: 28px;
-                        height: 28px;
-                        border-radius: 50%;
-                        border: 3px solid white;
-                        box-shadow: 0 3px 8px rgba(0,0,0,0.4);
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        color: white;
-                        font-size: 12px;
-                    "><i class="fa-solid ${layer ? layer.icon : 'fa-location-dot'}"></i></div>`,
+                    html: `<div style="background-color: ${color}; width: 28px; height: 28px; border-radius: 50%; border: 3px solid white; box-shadow: 0 3px 8px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; color: white; font-size: 12px;"><i class="fa-solid ${layer ? layer.icon : 'fa-location-dot'}"></i></div>`,
                     iconSize: [28, 28],
                     iconAnchor: [14, 14]
                 });
 
                 const marker = L.marker([item.lat, item.lng], { icon: customIcon }).addTo(map);
-
-                // Popup Content
                 const popupHTML = `
                     <div class="popup-card">
                         <img src="${item.image}" alt="${item.title}" onerror="this.src='https://via.placeholder.com/240x130?text=لا+توجد+صورة';">
@@ -973,7 +311,6 @@
                         <div class="date"><i class="fa-regular fa-calendar"></i> ${item.date}</div>
                     </div>
                 `;
-
                 marker.bindPopup(popupHTML);
                 mapMarkers[item.id] = marker;
             });
@@ -985,117 +322,6 @@
                 map.setView([item.lat, item.lng], 17, { animate: true });
                 mapMarkers[id].openPopup();
             }
-        }
-
-        // --- Modal & Form CRUD Actions ---
-        function openAddModal(lat = '', lng = '') {
-            document.getElementById('modal-title').innerText = 'إضافة إنجاز جديد';
-            document.getElementById('achievement-id').value = '';
-            document.getElementById('achievement-form').reset();
-            
-            document.getElementById('form-date').value = new Date().toISOString().split('T')[0];
-            if (lat && lng) {
-                document.getElementById('form-lat').value = parseFloat(lat).toFixed(6);
-                document.getElementById('form-lng').value = parseFloat(lng).toFixed(6);
-            } else {
-                document.getElementById('form-lat').value = '26.155';
-                document.getElementById('form-lng').value = '32.721';
-            }
-
-            document.getElementById('achievement-modal').classList.add('active');
-        }
-
-        function openEditModal(id) {
-            const item = achievements.find(a => a.id === id);
-            if (!item) return;
-
-            document.getElementById('modal-title').innerText = 'تعديل بيانات الإنجاز';
-            document.getElementById('achievement-id').value = item.id;
-            document.getElementById('form-title').value = item.title;
-            document.getElementById('form-layer').value = item.layerId;
-            document.getElementById('form-date').value = item.date;
-            document.getElementById('form-lat').value = item.lat;
-            document.getElementById('form-lng').value = item.lng;
-            document.getElementById('form-image').value = item.image;
-            document.getElementById('form-description').value = item.description || '';
-
-            document.getElementById('achievement-modal').classList.add('active');
-        }
-
-        function closeModal() {
-            document.getElementById('achievement-modal').classList.remove('active');
-        }
-
-        function saveAchievement(e) {
-            e.preventDefault();
-
-            const id = document.getElementById('achievement-id').value;
-            const title = document.getElementById('form-title').value;
-            const layerId = document.getElementById('form-layer').value;
-            const date = document.getElementById('form-date').value;
-            const lat = parseFloat(document.getElementById('form-lat').value);
-            const lng = parseFloat(document.getElementById('form-lng').value);
-            const image = document.getElementById('form-image').value || 'Image/default.jpg';
-            const description = document.getElementById('form-description').value;
-
-            if (id) {
-                // Update Existing
-                const index = achievements.findIndex(a => a.id === id);
-                if (index !== -1) {
-                    achievements[index] = { id, title, layerId, date, lat, lng, image, description };
-                }
-            } else {
-                // Create New
-                const newId = 'ach_' + Date.now();
-                achievements.push({ id: newId, title, layerId, date, lat, lng, image, description });
-            }
-
-            saveToLocalStorage();
-            renderLayerControls();
-            renderAchievementsList();
-            updateMapMarkers();
-            closeModal();
-        }
-
-        function deleteAchievement(id) {
-            if (confirm('هل أنت تأكد من إزالة هذا الإنجاز من الخريطة؟')) {
-                achievements = achievements.filter(a => a.id !== id);
-                saveToLocalStorage();
-                renderLayerControls();
-                renderAchievementsList();
-                updateMapMarkers();
-            }
-        }
-
-        // --- Export / Import JSON Data ---
-        function exportData() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(achievements, null, 2));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `university_achievements_${new Date().toISOString().split('T')[0]}.json`);
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-        }
-
-        function importData(event) {
-            const fileReader = new FileReader();
-            fileReader.onload = function(e) {
-                try {
-                    const parsed = JSON.parse(e.target.result);
-                    if (Array.isArray(parsed)) {
-                        achievements = parsed;
-                        saveToLocalStorage();
-                        renderLayerControls();
-                        renderAchievementsList();
-                        updateMapMarkers();
-                        alert('تم استيراد البيانات بنجاح!');
-                    }
-                } catch (err) {
-                    alert('خطأ في استيراد الملف، يرجى التأكد من اختيار ملف JSON صالح.');
-                }
-            };
-            fileReader.readAsText(event.target.files[0]);
         }
     </script>
 </body>
