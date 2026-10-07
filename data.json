@@ -4015,5 +4015,44 @@
     "audio": "",
     "description": "",
     "customFields": {}
+  },
+  {
+    "id": "ach_1791398279508",
+    "title": "أدلة مجال الدراسات العليا والبحث العلمي",
+    "layerId": "layer_1791397704911",
+    "date": "",
+    "lat": 26.193712,
+    "lng": 32.748281,
+    "image": "Image\\أدلة مجال الدراسات العليا والبحث العلمي.jpg",
+    "video": "",
+    "audio": "",
+    "description": "",
+    "customFields": {}
+  },
+  {
+    "id": "ach_1791398299036",
+    "title": "أدلة مجال الإدارة والحوكمة",
+    "layerId": "layer_1791397704911",
+    "date": "",
+    "lat": 26.193833,
+    "lng": 32.748377,
+    "image": "Image\\أدلة مجال الإدارة والحوكمة.jpg",
+    "video": "",
+    "audio": "",
+    "description": "",
+    "customFields": {}
+  },
+  {
+    "id": "ach_1791398566557",
+    "title": "أدلة مجال إدارة الجودة",
+    "layerId": "layer_1791397704911",
+    "date": "",
+    "lat": 26.191118,
+    "lng": 32.743421,
+    "image": "Image\\أدلة مجال إدارة الجودة.jpg",
+    "video": "",
+    "audio": "",
+    "description": "",
+    "customFields": {}
   }
 ]
