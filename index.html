@@ -3,12 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الخريطة التفاعلية لإنجازات جامعة قنا 2023 - 2026</title>
+    <title>الخريطة التفاعلية لإنجازات جامعة جنوب الوادي 2023 - 2026</title>
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <!-- MarkerCluster CSS for Clustered Pins -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <!-- Google Fonts (Cairo) -->
@@ -221,7 +218,7 @@
         <div class="brand-title">
             <img src="Image/logo.png" alt="شعار الجامعة" class="univ-logo" onerror="this.style.display='none';">
             <div>
-                <h1>الخريطة التفاعلية لإنجازات جامعة قنا 2023 - 2026</h1>
+                <h1>الخريطة التفاعلية لإنجازات جامعة قنا 2023 -2026</h1>
             </div>
         </div>
 
@@ -317,11 +314,9 @@
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- MarkerCluster JS for Clustering Pins -->
-    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
     <script>
-        // Layer Translation & Style Mapping Dictionary
+        // Default Layer Dictionary Palette
         const DEFAULT_LAYERS_DICT = [
             { id: 'construction', name: 'الإنشاءات والصيانة', color: '#ef4444', icon: 'fa-building' },
             { id: 'infrastructure', name: 'البنية التحتية', color: '#f59e0b', icon: 'fa-network-wired' },
@@ -340,7 +335,6 @@
         let detectedLayers = [];
         let activeLayers = new Set();
         let mapMarkers = {};
-        let markerClusterGroup;
 
         const TILE_SERVERS = {
             satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 18, attribution: '&copy; Esri' }),
@@ -359,15 +353,6 @@
             // Set Default Map to Satellite
             activeTileLayer = TILE_SERVERS.satellite;
             activeTileLayer.addTo(map);
-
-            // Initialize Marker Cluster Group
-            markerClusterGroup = L.markerClusterGroup({
-                chunkedLoading: true,
-                spiderfyOnMaxZoom: true,
-                showCoverageOnHover: false,
-                zoomToBoundsOnClick: true
-            });
-            map.addLayer(markerClusterGroup);
         }
 
         function toggleSection(bodyId, headerEl) {
@@ -416,43 +401,26 @@
                 });
         }
 
-        // Dynamically clean layer names and map them cleanly to Arabic
+        // Dynamically detect layers present in data.json
         function extractDynamicLayers() {
             const usedLayerIds = new Set(achievements.map(a => a.layerId));
             detectedLayers = [];
-
-            let layerIndexCounter = 1;
 
             usedLayerIds.forEach(id => {
                 const found = DEFAULT_LAYERS_DICT.find(l => l.id === id);
                 if (found) {
                     detectedLayers.push(found);
                 } else {
-                    // Friendly Arabic fallback name for auto-generated layer IDs
-                    let cleanName = id;
-                    if (id.startsWith('layer_')) {
-                        cleanName = `طبقة مخصصة (${layerIndexCounter++})`;
-                    }
-
                     detectedLayers.push({
                         id: id,
-                        name: cleanName,
-                        color: getRandomColor(id),
-                        icon: 'fa-layer-group'
+                        name: id,
+                        color: '#1e3a8a',
+                        icon: 'fa-location-dot'
                     });
                 }
             });
 
             activeLayers = new Set(detectedLayers.map(l => l.id));
-        }
-
-        function getRandomColor(str) {
-            let hash = 0;
-            for (let i = 0; i < str.length; i++) {
-                hash = str.charCodeAt(i) + ((hash << 5) - hash);
-            }
-            const c = (hash & 0x00FFFFFF).toString(16).toUpperCase();
-            return '#' + '00000'.substring(0, 6 - c.length) + c;
         }
 
         function renderLayerControls() {
@@ -520,6 +488,7 @@
                 const isLayerActive = activeLayers.has(item.layerId);
                 const isDateValid = (!startDate || !item.date || item.date >= startDate) && (!endDate || !item.date || item.date <= endDate);
                 
+                // Search Filter
                 let matchesSearch = true;
                 if (searchText !== '') {
                     const titleMatch = item.title && item.title.toLowerCase().includes(searchText);
@@ -556,7 +525,7 @@
         }
 
         function updateMapMarkers() {
-            markerClusterGroup.clearLayers();
+            Object.values(mapMarkers).forEach(marker => map.removeLayer(marker));
             mapMarkers = {};
 
             const filtered = getFilteredAchievements();
@@ -571,7 +540,7 @@
                     iconAnchor: [14, 14]
                 });
 
-                const marker = L.marker([item.lat, item.lng], { icon: customIcon });
+                const marker = L.marker([item.lat, item.lng], { icon: customIcon }).addTo(map);
                 
                 let imageHTML = item.image ? `<img src="${item.image}" alt="${item.title}" onerror="this.style.display='none';">` : '';
                 let videoHTML = item.video ? `<video controls src="${item.video}"></video>` : '';
@@ -601,16 +570,14 @@
                 `;
                 marker.bindPopup(popupHTML);
                 mapMarkers[item.id] = marker;
-                markerClusterGroup.addLayer(marker);
             });
         }
 
         function focusOnMap(id) {
             const item = achievements.find(a => a.id === id);
             if (item && mapMarkers[id]) {
-                markerClusterGroup.zoomToShowLayer(mapMarkers[id], () => {
-                    mapMarkers[id].openPopup();
-                });
+                map.setView([item.lat, item.lng], 17, { animate: true });
+                mapMarkers[id].openPopup();
             }
         }
     </script>
