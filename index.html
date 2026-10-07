@@ -401,7 +401,7 @@
                 });
         }
 
-        // Detect layers present in data.json that match DEFAULT_LAYERS_DICT
+        // Dynamically detect layers present in data.json
         function extractDynamicLayers() {
             const usedLayerIds = new Set(achievements.map(a => a.layerId));
             detectedLayers = [];
@@ -410,6 +410,13 @@
                 const found = DEFAULT_LAYERS_DICT.find(l => l.id === id);
                 if (found) {
                     detectedLayers.push(found);
+                } else {
+                    detectedLayers.push({
+                        id: id,
+                        name: id,
+                        color: '#1e3a8a',
+                        icon: 'fa-location-dot'
+                    });
                 }
             });
 
