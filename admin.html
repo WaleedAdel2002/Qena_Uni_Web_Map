@@ -27,7 +27,7 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
-        body { display: flex; height: 100vh; overflow: hidden; background-color: var(--bg-light); color: var(--text-main); }
+        body { display: flex; text-align: right; height: 100vh; overflow: hidden; background-color: var(--bg-light); color: var(--text-main); }
 
         .top-header {
             position: absolute; top: 0; left: 0; right: 0; height: 60px;
@@ -126,8 +126,24 @@
         .popup-card audio { width: 100%; height: 35px; margin-bottom: 8px; }
         .popup-card h4 { font-size: 0.95rem; color: var(--primary-color); margin-bottom: 4px; }
         .popup-card p { font-size: 0.8rem; color: #334155; margin-bottom: 8px; line-height: 1.4; }
-        .popup-card .field-item { font-size: 0.78rem; background: #f1f5f9; padding: 4px 8px; border-radius: 4px; margin-bottom: 4px; border-right: 3px solid var(--primary-color); }
+        .popup-card .field-item { font-size: 0.78rem; background: #f1f5f9; padding: 4px 8px; border-radius: 4px; margin-bottom: 4px; border-right: 3px solid var(--primary-color); text-align: right; }
         .popup-card .field-item span { font-weight: 700; color: #0f172a; }
+/* إجبار الخريطة والنوافذ المنبثقة على محاذاة اليمين */
+.leaflet-popup-content-wrapper, 
+.leaflet-popup-content, 
+.popup-card {
+    text-align: right !important;
+    direction: rtl !important;
+}
+
+/* محاذاة عناصر القائمة ومدخلات البحث والنماذج */
+.achievement-card, 
+.layer-item, 
+.modal-body, 
+.form-group label, 
+.form-control {
+    text-align: right;
+}
     </style>
 </head>
 <body>
@@ -319,7 +335,15 @@
             { id: 'education', name: 'البيئة التعليمية', color: '#10b981', icon: 'fa-graduation-cap' },
             { id: 'logistics', name: 'الخدمات اللوجستية', color: '#3b82f6', icon: 'fa-truck-ramp-box' },
             { id: 'roads', name: 'الطرق والبوابات', color: '#8b5cf6', icon: 'fa-road' },
-            { id: 'general_site', name: 'الموقع العام', color: '#ec4899', icon: 'fa-map-location-dot' }
+            { id: 'general_site', name: 'الموقع العام', color: '#ec4899', icon: 'fa-map-location-dot' },
+            { id: 'organizational', name: 'قائمة الأدلة التنظيمية', color: '#6366f1', icon: 'fa-book' },
+            { id: 'digital_transform', name: 'قائمة التحول الرقمي', color: '#14b8a6', icon: 'fa-laptop-code' },
+            { id: 'engineering_projects', name: 'قائمة المشروعات الهندسة', color: '#84cc16', icon: 'fa-compass-drafting' },
+            { id: 'car_shades', name: 'قائمة مظلات السيارات', color: '#64748b', icon: 'fa-square-parking' },
+            { id: 'student_shades', name: 'قائمة مظلات الطلاب', color: '#06b6d4', icon: 'fa-umbrella' },
+            { id: 'layer_1791384461841', name: 'مباني ومرافق الجامعة', color: '#1e3a8a', icon: 'fa-building-columns' },
+            { id: 'layer_1791395851126', name: 'التحول الرقمي', color: '#14b8a6', icon: 'fa-laptop-code' },
+            { id: 'layer_1791397704911', name: 'الأدلة التنظيمية', color: '#6366f1', icon: 'fa-book' }
         ];
 
         let map, activeTileLayer, achievements = [];
@@ -361,6 +385,7 @@
                 .then(data => {
                     achievements = data;
                     renderAchievementsList();
+                    renderLayersManager();
                     updateMapMarkers();
                 })
                 .catch(() => console.log('قم باستيراد ملف data.json القائم للبدء.'));
@@ -435,7 +460,7 @@
                 card.innerHTML = `
                     <div class="title">${item.title}</div>
                     <div class="meta">
-                        <span><i class="fa-solid fa-tag"></i> ${layer ? layer.name : ''}</span>
+                        <span><i class="fa-solid fa-tag"></i> ${layer ? layer.name : item.layerId}</span>
                         ${dateHTML}
                     </div>
                     <div class="actions" onclick="event.stopPropagation()">
@@ -617,6 +642,20 @@
                     const parsed = JSON.parse(e.target.result);
                     if (Array.isArray(parsed)) {
                         achievements = parsed;
+                        
+                        // فحص الملف لاستخراج أي طبقات جديدة لم تُعرّف في النظام وإضافتها تلقائياً
+                        parsed.forEach(item => {
+                            if (item.layerId && !LAYERS_CONFIG.some(l => l.id === item.layerId)) {
+                                LAYERS_CONFIG.push({
+                                    id: item.layerId,
+                                    name: item.layerId,
+                                    color: '#1e3a8a',
+                                    icon: 'fa-location-dot'
+                                });
+                            }
+                        });
+
+                        renderLayerSelectOptions();
                         renderAchievementsList();
                         renderLayersManager();
                         updateMapMarkers();
