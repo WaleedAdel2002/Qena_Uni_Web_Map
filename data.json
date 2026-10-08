@@ -4054,5 +4054,31 @@
     "audio": "",
     "description": "",
     "customFields": {}
+  },
+  {
+    "id": "ach_1791436076854",
+    "title": "مظلات طلاب كلية الآداب",
+    "layerId": "student_shades",
+    "date": "",
+    "lat": 26.190165,
+    "lng": 32.742337,
+    "image": "",
+    "video": "",
+    "audio": "",
+    "description": "",
+    "customFields": {}
+  },
+  {
+    "id": "ach_1791436105493",
+    "title": "مظلات سيارات كلية الآداب",
+    "layerId": "car_shades",
+    "date": "",
+    "lat": 26.189626,
+    "lng": 32.742139,
+    "image": "",
+    "video": "",
+    "audio": "",
+    "description": "",
+    "customFields": {}
   }
 ]
