@@ -6,6 +6,9 @@
     <title>الخريطة التفاعلية لإنجازات جامعة جنوب الوادي 2023 - 2026</title>
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- MarkerCluster CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <!-- Google Fonts (Cairo) -->
@@ -199,7 +202,7 @@
         .achievement-card .title { font-size: 0.9rem; font-weight: 700; color: var(--primary-color); margin-bottom: 4px; }
         .achievement-card .meta { display: flex; gap: 12px; font-size: 0.75rem; color: var(--text-muted); }
 
-        #map { flex: 1; height: 100%; background: #e2e8f0; position: relative; }
+        #map { flex: 1; height: 100%; background: #e2e8f0; }
 
         .popup-card { width: 250px; }
         .popup-card img, .popup-card video { width: 100%; height: 130px; object-fit: cover; border-radius: 6px; margin-bottom: 8px; }
@@ -228,28 +231,13 @@
             text-align: right;
         }
 
-        /* شريط تنبيه التقريب لفك الزحمة */
-        .zoom-hint-box {
-            position: absolute;
-            bottom: 25px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(15, 23, 42, 0.88);
-            color: white;
-            padding: 8px 18px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            z-index: 800;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-            backdrop-filter: blur(4px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            pointer-events: none;
-            transition: all 0.3s ease;
-        }
+        /* تخصيص أنيق لدوائر التجميع الخاصة بـ MarkerCluster */
+        .marker-cluster-small { background-color: rgba(30, 58, 138, 0.6) !important; }
+        .marker-cluster-small div { background-color: rgba(30, 58, 138, 0.85) !important; color: white !important; font-weight: 800; font-family: 'Cairo', sans-serif; }
+        .marker-cluster-medium { background-color: rgba(245, 158, 11, 0.6) !important; }
+        .marker-cluster-medium div { background-color: rgba(245, 158, 11, 0.85) !important; color: white !important; font-weight: 800; font-family: 'Cairo', sans-serif; }
+        .marker-cluster-large { background-color: rgba(239, 68, 68, 0.6) !important; }
+        .marker-cluster-large div { background-color: rgba(239, 68, 68, 0.85) !important; color: white !important; font-weight: 800; font-family: 'Cairo', sans-serif; }
     </style>
 </head>
 <body>
@@ -354,6 +342,8 @@
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- MarkerCluster JS -->
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
     <script>
         // Default Layer Dictionary Palette
@@ -378,9 +368,7 @@
         let detectedLayers = [];
         let activeLayers = new Set();
         let mapMarkers = {};
-
-        // الحد الأدنى لمستوى الزوم لإظهار النقاط على الخريطة لتجنب الزحمة
-        const MIN_ZOOM_TO_SHOW_MARKERS = 16;
+        let markersClusterGroup; // مجموعة التجميع لفك الزحمة
 
         const TILE_SERVERS = {
             satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 18, attribution: '&copy; Esri' }),
@@ -400,11 +388,12 @@
             activeTileLayer = TILE_SERVERS.satellite;
             activeTileLayer.addTo(map);
 
-            // الاستماع لتغيرات تقريب الخريطة (Zoom) لتحديث النقاط والتنبيه تلقائياً
-            map.on('zoomend', () => {
-                updateMapMarkers();
-                checkZoomHint();
+            // تهيئة مجموعة التجميع
+            markersClusterGroup = L.markerClusterGroup({
+                disableClusteringAtZoom: 18, // عند أقصى زوم تفكك جميع النقاط
+                spiderfyOnMaxZoom: true      // توزيع النقاط إذا كانت بنفس الإحداثيات تماماً
             });
+            map.addLayer(markersClusterGroup);
         }
 
         function toggleSection(bodyId, headerEl) {
@@ -447,7 +436,6 @@
                     renderLayerControls();
                     renderAchievementsList();
                     updateMapMarkers();
-                    checkZoomHint();
                 })
                 .catch(error => {
                     console.error('Error loading data.json:', error);
@@ -578,14 +566,9 @@
         }
 
         function updateMapMarkers() {
-            // إزالة جميع العلامات السابقة من الخريطة
-            Object.values(mapMarkers).forEach(marker => map.removeLayer(marker));
+            // مسح جميع الطبقات المجمعة السابقة
+            markersClusterGroup.clearLayers();
             mapMarkers = {};
-
-            // فحص مستوى الزوم الحالي: إذا كان أقل من الحد المسموح (16) لا تُعرض العلامات لمنع الزحمة
-            if (map.getZoom() < MIN_ZOOM_TO_SHOW_MARKERS) {
-                return;
-            }
 
             const filtered = getFilteredAchievements();
             filtered.forEach(item => {
@@ -599,7 +582,7 @@
                     iconAnchor: [14, 14]
                 });
 
-                const marker = L.marker([item.lat, item.lng], { icon: customIcon }).addTo(map);
+                const marker = L.marker([item.lat, item.lng], { icon: customIcon });
                 
                 let imageHTML = item.image ? `<img src="${item.image}" alt="${item.title}" onerror="this.style.display='none';">` : '';
                 let videoHTML = item.video ? `<video controls src="${item.video}"></video>` : '';
@@ -628,36 +611,20 @@
                     </div>
                 `;
                 marker.bindPopup(popupHTML);
+
+                // إضافة النقاط لمجموعة التجميع لفك الزحمة
+                markersClusterGroup.addLayer(marker);
                 mapMarkers[item.id] = marker;
             });
         }
 
-        // دالة التنبيه الطافية للتقريب
-        function checkZoomHint() {
-            let hintEl = document.getElementById('zoom-hint');
-            if (!hintEl) {
-                hintEl = document.createElement('div');
-                hintEl.id = 'zoom-hint';
-                hintEl.className = 'zoom-hint-box';
-                hintEl.innerHTML = '<i class="fa-solid fa-magnifying-glass-plus"></i> قم بتقريب الخريطة لإظهار النقاط والإنجازات';
-                document.getElementById('map').appendChild(hintEl);
-            }
-
-            if (map.getZoom() < MIN_ZOOM_TO_SHOW_MARKERS) {
-                hintEl.style.display = 'flex';
-            } else {
-                hintEl.style.display = 'none';
-            }
-        }
-
         function focusOnMap(id) {
             const item = achievements.find(a => a.id === id);
-            if (item) {
-                // عند الضغط على إنجاز في القائمة يتم التقريب تلقائياً وإظهار النقطة
-                map.setView([item.lat, item.lng], 17, { animate: true });
-                setTimeout(() => {
-                    if (mapMarkers[id]) mapMarkers[id].openPopup();
-                }, 300);
+            if (item && mapMarkers[id]) {
+                // تركيز الخريطة على المكان وتوسيع التجمع إذا كانت النقطة بداخله
+                markersClusterGroup.zoomToShowLayer(mapMarkers[id], () => {
+                    mapMarkers[id].openPopup();
+                });
             }
         }
     </script>
