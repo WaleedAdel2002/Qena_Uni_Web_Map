@@ -4080,5 +4080,59 @@
     "audio": "",
     "description": "",
     "customFields": {}
+  },
+  {
+    "id": "ach_2791397546920",
+    "title": 1,
+    "layerId": "student_shades",
+    "lat": 26.18977458,
+    "lng": 32.74256598,
+    "image": "<Null>",
+    "video": "<Null>",
+    "audio": "<Null>",
+    "description": "<Null>"
+  },
+  {
+    "id": "ach_2791397546921",
+    "title": 2,
+    "layerId": "car_shades",
+    "lat": 26.19010612,
+    "lng": 32.74383534,
+    "image": "<Null>",
+    "video": "<Null>",
+    "audio": "<Null>",
+    "description": "<Null>"
+  },
+  {
+    "id": "ach_2791397546922",
+    "title": 3,
+    "layerId": "student_shades",
+    "lat": 26.19056312,
+    "lng": 32.74328951,
+    "image": "<Null>",
+    "video": "<Null>",
+    "audio": "<Null>",
+    "description": "<Null>"
+  },
+  {
+    "id": "ach_2791397546923",
+    "title": 4,
+    "layerId": "car_shades",
+    "lat": 26.19103094,
+    "lng": 32.74351481,
+    "image": "<Null>",
+    "video": "<Null>",
+    "audio": "<Null>",
+    "description": "<Null>"
+  },
+  {
+    "id": "ach_2791397546924",
+    "layerId": "car_shades",
+    "lat": 26.19132096,
+    "lng": 32.74324156,
+    "image": "<Null>",
+    "video": "<Null>",
+    "audio": "<Null>",
+    "description": "<Null>"
   }
 ]
