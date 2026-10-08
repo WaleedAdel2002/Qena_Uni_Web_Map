@@ -54,7 +54,7 @@
             flex-direction: column; 
             z-index: 900; 
             overflow: hidden; 
-            transition: margin-right 0.3s ease;
+            transition: margin-right 0.3s ease, width 0.3s ease;
             position: relative;
         }
 
@@ -96,15 +96,20 @@
             background: var(--primary-color);
             color: white;
             border: none;
-            padding: 10px 14px;
+            padding: 10px 16px;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             cursor: pointer;
             font-weight: 700;
             font-size: 0.85rem;
-            display: none;
+            display: flex; /* العرض الافتراضي مفعل لأن القائمة مخفية */
             align-items: center;
             gap: 8px;
+            transition: background 0.2s;
+        }
+
+        .open-sidebar-btn:hover {
+            background: #1e40af;
         }
 
         .stats-card { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; flex: 1; }
@@ -238,6 +243,63 @@
         .marker-cluster-medium div { background-color: rgba(245, 158, 11, 0.85) !important; color: white !important; font-weight: 800; font-family: 'Cairo', sans-serif; }
         .marker-cluster-large { background-color: rgba(239, 68, 68, 0.6) !important; }
         .marker-cluster-large div { background-color: rgba(239, 68, 68, 0.85) !important; color: white !important; font-weight: 800; font-family: 'Cairo', sans-serif; }
+
+        /* ========================================================= */
+        /* التجاوب مع الهواتف للشاشات الصغيرة (Responsive Design)     */
+        /* ========================================================= */
+        @media (max-width: 768px) {
+            :root {
+                --sidebar-width: 100%; /* العرض بالكامل على الجوال */
+            }
+
+            .top-header {
+                padding: 0 12px;
+                height: 55px;
+            }
+
+            .brand-title h1 {
+                font-size: 0.85rem;
+            }
+
+            .univ-logo {
+                width: 34px;
+                height: 34px;
+            }
+
+            .map-type-btn {
+                padding: 4px 8px;
+                font-size: 0.75rem;
+            }
+
+            .app-container {
+                height: calc(100vh - 55px);
+                margin-top: 55px;
+            }
+
+            .sidebar {
+                position: absolute;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                height: 100%;
+                z-index: 1100; /* يظهر فوق كل العناصر بما فيها الهيدر على الموبايل */
+            }
+
+            .sidebar.collapsed {
+                margin-right: -100%;
+            }
+
+            .open-sidebar-btn {
+                top: 10px;
+                right: 10px;
+                padding: 8px 12px;
+                font-size: 0.8rem;
+            }
+
+            .popup-card {
+                width: 200px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -264,11 +326,13 @@
 
     <div class="app-container">
         
+        <!-- زر فتح القائمة الجانبية المحدث والافتراضي ظهوره -->
         <button class="open-sidebar-btn" id="open-sidebar-btn" onclick="toggleSidebar(false)">
             <i class="fa-solid fa-bars"></i> عرض قائمة الإنجازات
         </button>
 
-        <aside class="sidebar" id="sidebar">
+        <!-- الشريط الجانبي ومزود بكلاس collapsed افتراضياً ليظل مخفياً -->
+        <aside class="sidebar collapsed" id="sidebar">
             <div class="sidebar-header">
                 <div class="stats-card">
                     <div class="stat-box">
@@ -368,7 +432,7 @@
         let detectedLayers = [];
         let activeLayers = new Set();
         let mapMarkers = {};
-        let markersClusterGroup; // مجموعة التجميع لفك الزحمة
+        let markersClusterGroup;
 
         const TILE_SERVERS = {
             satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 18, attribution: '&copy; Esri' }),
@@ -390,8 +454,8 @@
 
             // تهيئة مجموعة التجميع
             markersClusterGroup = L.markerClusterGroup({
-                disableClusteringAtZoom: 18, // عند أقصى زوم تفكك جميع النقاط
-                spiderfyOnMaxZoom: true      // توزيع النقاط إذا كانت بنفس الإحداثيات تماماً
+                disableClusteringAtZoom: 18,
+                spiderfyOnMaxZoom: true
             });
             map.addLayer(markersClusterGroup);
         }
@@ -566,7 +630,6 @@
         }
 
         function updateMapMarkers() {
-            // مسح جميع الطبقات المجمعة السابقة
             markersClusterGroup.clearLayers();
             mapMarkers = {};
 
@@ -612,7 +675,6 @@
                 `;
                 marker.bindPopup(popupHTML);
 
-                // إضافة النقاط لمجموعة التجميع لفك الزحمة
                 markersClusterGroup.addLayer(marker);
                 mapMarkers[item.id] = marker;
             });
@@ -621,7 +683,11 @@
         function focusOnMap(id) {
             const item = achievements.find(a => a.id === id);
             if (item && mapMarkers[id]) {
-                // تركيز الخريطة على المكان وتوسيع التجمع إذا كانت النقطة بداخله
+                // إغلاق الشريط الجانبي تلقائياً بعد اختيار إنجاز للتركيز على الخريطة عند استخدام الهاتف
+                if (window.innerWidth <= 768) {
+                    toggleSidebar(true);
+                }
+
                 markersClusterGroup.zoomToShowLayer(mapMarkers[id], () => {
                     mapMarkers[id].openPopup();
                 });
