@@ -73,10 +73,72 @@
         }
 
         .app-container { display: flex; width: 100%; height: calc(100vh - 60px); margin-top: 60px; position: relative; }
-        .sidebar { width: var(--sidebar-width); background: var(--panel-bg); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; z-index: 900; overflow: hidden; }
-        .sidebar-header { padding: 16px 20px; border-bottom: 1px solid var(--border-color); background: #f8fafc; }
+        
+        .sidebar { 
+            width: var(--sidebar-width); 
+            background: var(--panel-bg); 
+            border-left: 1px solid var(--border-color); 
+            display: flex; 
+            flex-direction: column; 
+            z-index: 900; 
+            overflow: hidden; 
+            transition: margin-right 0.3s ease, width 0.3s ease;
+            position: relative;
+        }
 
-        .stats-card { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .sidebar.collapsed {
+            margin-right: calc(-1 * var(--sidebar-width));
+        }
+
+        .sidebar-header { 
+            padding: 16px 20px; 
+            border-bottom: 1px solid var(--border-color); 
+            background: #f8fafc; 
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .toggle-btn {
+            background: #e2e8f0;
+            border: none;
+            color: var(--text-main);
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .toggle-btn:hover { background: #cbd5e1; }
+
+        .open-sidebar-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 850;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.85rem;
+            display: flex; /* ليكون ظاهراً عند البدء */
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+
+        .open-sidebar-btn:hover { background: var(--primary-hover); }
+
+        .stats-card { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; flex: 1; }
         .stat-box { background: white; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); text-align: center; }
         .stat-box .number { font-size: 1.4rem; font-weight: 800; color: var(--primary-color); }
         .stat-box .label { font-size: 0.75rem; color: var(--text-muted); }
@@ -128,22 +190,83 @@
         .popup-card p { font-size: 0.8rem; color: #334155; margin-bottom: 8px; line-height: 1.4; }
         .popup-card .field-item { font-size: 0.78rem; background: #f1f5f9; padding: 4px 8px; border-radius: 4px; margin-bottom: 4px; border-right: 3px solid var(--primary-color); text-align: right; }
         .popup-card .field-item span { font-weight: 700; color: #0f172a; }
-/* إجبار الخريطة والنوافذ المنبثقة على محاذاة اليمين */
-.leaflet-popup-content-wrapper, 
-.leaflet-popup-content, 
-.popup-card {
-    text-align: right !important;
-    direction: rtl !important;
-}
 
-/* محاذاة عناصر القائمة ومدخلات البحث والنماذج */
-.achievement-card, 
-.layer-item, 
-.modal-body, 
-.form-group label, 
-.form-control {
-    text-align: right;
-}
+        /* إجبار الخريطة والنوافذ المنبثقة على محاذاة اليمين */
+        .leaflet-popup-content-wrapper, 
+        .leaflet-popup-content, 
+        .popup-card {
+            text-align: right !important;
+            direction: rtl !important;
+        }
+
+        /* محاذاة عناصر القائمة ومدخلات البحث والنماذج */
+        .achievement-card, 
+        .layer-item, 
+        .modal-body, 
+        .form-group label, 
+        .form-control {
+            text-align: right;
+        }
+
+        /* ========================================================= */
+        /* التجاوب مع الهواتف للشاشات الصغيرة (Responsive Design)     */
+        /* ========================================================= */
+        @media (max-width: 768px) {
+            :root {
+                --sidebar-width: 100%;
+            }
+
+            .top-header {
+                padding: 0 10px;
+                height: 55px;
+            }
+
+            .brand-title h1 {
+                font-size: 0.85rem;
+            }
+
+            .admin-badge {
+                display: none;
+            }
+
+            .header-controls {
+                gap: 5px;
+            }
+
+            .btn-import-json, .btn-export-json, .btn-add-achievement {
+                padding: 6px 8px;
+                font-size: 0.72rem;
+            }
+
+            .app-container {
+                height: calc(100vh - 55px);
+                margin-top: 55px;
+            }
+
+            .sidebar {
+                position: absolute;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                height: 100%;
+                z-index: 1100;
+            }
+
+            .sidebar.collapsed {
+                margin-right: -100%;
+            }
+
+            .open-sidebar-btn {
+                top: 10px;
+                right: 10px;
+                padding: 8px 12px;
+                font-size: 0.8rem;
+            }
+
+            .popup-card {
+                width: 200px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -184,7 +307,13 @@
 
     <div class="app-container">
         
-        <aside class="sidebar">
+        <!-- زر فتح القائمة الجانبية -->
+        <button class="open-sidebar-btn" id="open-sidebar-btn" onclick="toggleSidebar(false)">
+            <i class="fa-solid fa-bars"></i> عرض قائمة الإنجازات
+        </button>
+
+        <!-- الشريط الجانبي (مخفي افتراضياً عبر collapsed) -->
+        <aside class="sidebar collapsed" id="sidebar">
             <div class="sidebar-header">
                 <div class="stats-card">
                     <div class="stat-box">
@@ -193,9 +322,12 @@
                     </div>
                     <div class="stat-box">
                         <div class="number" id="active-layers-count">0</div>
-                        <div class="label">عدد الطبقات</div>
+                        <div class="label">الطبقات المفعلة</div>
                     </div>
                 </div>
+                <button class="toggle-btn" title="إغلاق القائمة" onclick="toggleSidebar(true)">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
             </div>
 
             <div class="sidebar-content">
@@ -263,7 +395,6 @@
                         </div>
                     </div>
 
-                    <!-- New Audio & Video Optional Fields -->
                     <div class="form-grid">
                         <div class="form-group">
                             <label>مسار ملف الفيديو (اختياري)</label>
@@ -348,6 +479,7 @@
 
         let map, activeTileLayer, achievements = [];
         let mapMarkers = {};
+        let activeLayers = new Set(); // للتحكم بالطبقات المفعلة
 
         const TILE_SERVERS = {
             streets: L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' }),
@@ -355,6 +487,9 @@
         };
 
         document.addEventListener('DOMContentLoaded', () => {
+            // تفعيل جميع الطبقات عند التحميل أول مرة
+            activeLayers = new Set(LAYERS_CONFIG.map(l => l.id));
+            
             initMap();
             renderLayerSelectOptions();
             renderLayersManager();
@@ -369,6 +504,23 @@
             activeTileLayer.addTo(map);
 
             map.on('click', (e) => openAddModal(e.latlng.lat, e.latlng.lng));
+        }
+
+        function toggleSidebar(collapse) {
+            const sidebar = document.getElementById('sidebar');
+            const openBtn = document.getElementById('open-sidebar-btn');
+
+            if (collapse) {
+                sidebar.classList.add('collapsed');
+                openBtn.style.display = 'flex';
+            } else {
+                sidebar.classList.remove('collapsed');
+                openBtn.style.display = 'none';
+            }
+
+            setTimeout(() => {
+                if (map) map.invalidateSize();
+            }, 300);
         }
 
         function switchMapLayer(mode) {
@@ -394,21 +546,33 @@
         function renderLayersManager() {
             const container = document.getElementById('layers-list-container');
             container.innerHTML = '';
-            document.getElementById('active-layers-count').innerText = LAYERS_CONFIG.length;
+            document.getElementById('active-layers-count').innerText = activeLayers.size;
 
             LAYERS_CONFIG.forEach(l => {
                 const count = achievements.filter(a => a.layerId === l.id).length;
+                const isChecked = activeLayers.has(l.id);
+
                 const div = document.createElement('div');
                 div.style.cssText = 'display:flex; align-items:center; justify-content:space-between; background:#f8fafc; padding:6px 10px; border-radius:6px; font-size:0.8rem; border:1px solid #e2e8f0;';
                 div.innerHTML = `
                     <div style="display:flex; align-items:center; gap:8px;">
                         <span style="width:10px; height:10px; border-radius:50%; background:${l.color}; display:inline-block;"></span>
-                        <span style="font-weight:600;">${l.name}</span>
+                        <span style="font-weight:600;">${l.name} (${count})</span>
                     </div>
-                    <span style="color:#64748b; font-size:0.75rem;">(${count})</span>
+                    <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleLayerVisibility('${l.id}', this.checked)">
                 `;
                 container.appendChild(div);
             });
+        }
+
+        function toggleLayerVisibility(layerId, isChecked) {
+            if (isChecked) {
+                activeLayers.add(layerId);
+            } else {
+                activeLayers.delete(layerId);
+            }
+            renderLayersManager();
+            updateMapMarkers();
         }
 
         function renderLayerSelectOptions() {
@@ -427,6 +591,8 @@
             const id = 'layer_' + Date.now();
 
             LAYERS_CONFIG.push({ id, name, color, icon: 'fa-location-dot' });
+            activeLayers.add(id);
+
             renderLayerSelectOptions();
             renderLayersManager();
             closeModal('layer-modal');
@@ -477,6 +643,9 @@
             mapMarkers = {};
 
             achievements.forEach(item => {
+                // إظهار النقاط فقط إذا كانت الطبقة الخاصة بها مفعلة في الـ Checkbox
+                if (!activeLayers.has(item.layerId)) return;
+
                 const layer = LAYERS_CONFIG.find(l => l.id === item.layerId);
                 const color = layer ? layer.color : '#1e3a8a';
 
@@ -489,7 +658,6 @@
 
                 const marker = L.marker([item.lat, item.lng], { icon: customIcon }).addTo(map);
 
-                // Build Dynamic Media Elements
                 let imageHTML = (item.image && item.image.trim() !== '') ? `<img src="${item.image}" onerror="this.style.display='none';">` : '';
                 let videoHTML = (item.video && item.video.trim() !== '') ? `<video controls src="${item.video}"></video>` : '';
                 let audioHTML = (item.audio && item.audio.trim() !== '') ? `<audio controls src="${item.audio}"></audio>` : '';
@@ -526,6 +694,9 @@
         function focusOnMap(id) {
             const item = achievements.find(a => a.id === id);
             if (item && mapMarkers[id]) {
+                if (window.innerWidth <= 768) {
+                    toggleSidebar(true);
+                }
                 map.setView([item.lat, item.lng], 17, { animate: true });
                 mapMarkers[id].openPopup();
             }
@@ -643,7 +814,6 @@
                     if (Array.isArray(parsed)) {
                         achievements = parsed;
                         
-                        // فحص الملف لاستخراج أي طبقات جديدة لم تُعرّف في النظام وإضافتها تلقائياً
                         parsed.forEach(item => {
                             if (item.layerId && !LAYERS_CONFIG.some(l => l.id === item.layerId)) {
                                 LAYERS_CONFIG.push({
@@ -653,6 +823,7 @@
                                     icon: 'fa-location-dot'
                                 });
                             }
+                            activeLayers.add(item.layerId);
                         });
 
                         renderLayerSelectOptions();
