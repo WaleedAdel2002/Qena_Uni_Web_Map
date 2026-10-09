@@ -331,6 +331,12 @@
             </div>
 
             <div class="sidebar-content">
+                <!-- خانة البحث المضافة -->
+                <div style="margin-bottom: 16px; position: relative;">
+                    <i class="fa-solid fa-magnifying-glass" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.85rem;"></i>
+                    <input type="text" id="admin-search-input" class="form-control" style="padding-right: 36px; background: #f8fafc;" placeholder="بحث في الإنجازات والمشاريع..." oninput="renderAchievementsList()">
+                </div>
+
                 <div class="section-title">
                     <span><i class="fa-solid fa-layer-group"></i> إدارة الطبقات</span>
                     <button class="btn-sm-action" onclick="openAddLayerModal()"><i class="fa-solid fa-plus"></i> إضافة طبقة</button>
@@ -612,9 +618,32 @@
         function renderAchievementsList() {
             const container = document.getElementById('achievements-container');
             container.innerHTML = '';
-            document.getElementById('total-count').innerText = achievements.length;
+            
+            const searchInput = document.getElementById('admin-search-input');
+            const searchText = searchInput ? searchInput.value.trim().toLowerCase() : '';
 
-            achievements.forEach(item => {
+            const filteredAchievements = achievements.filter(item => {
+                if (!searchText) return true;
+                
+                const titleMatch = item.title && item.title.toLowerCase().includes(searchText);
+                const descMatch = item.description && item.description.toLowerCase().includes(searchText);
+                
+                let customMatch = false;
+                if (item.customFields && typeof item.customFields === 'object') {
+                    customMatch = Object.values(item.customFields).some(val => val && val.toString().toLowerCase().includes(searchText));
+                }
+                
+                return titleMatch || descMatch || customMatch;
+            });
+
+            document.getElementById('total-count').innerText = filteredAchievements.length;
+
+            if (filteredAchievements.length === 0) {
+                container.innerHTML = '<div style="font-size:0.8rem; color:var(--text-muted); text-align:center; padding:10px;">لا توجد إنجازات مطابقة للبحث.</div>';
+                return;
+            }
+
+            filteredAchievements.forEach(item => {
                 const layer = LAYERS_CONFIG.find(l => l.id === item.layerId);
                 const card = document.createElement('div');
                 card.className = 'achievement-card';
