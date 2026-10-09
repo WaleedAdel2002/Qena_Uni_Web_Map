@@ -175,20 +175,20 @@
             transform: rotate(-90deg);
         }
 
-        .collapsible-body {
-            max-height: 1000px;
-            overflow: hidden;
-            transition: max-height 0.3s ease-in-out, opacity 0.2s ease;
-            opacity: 1;
-            margin-bottom: 16px;
-        }
+.collapsible-body {
+    max-height: none; /* لإزالة القيد على الارتفاع */
+    overflow: visible;
+    transition: opacity 0.2s ease;
+    opacity: 1;
+    margin-bottom: 16px;
+}
 
-        .collapsible-body.collapsed {
-            max-height: 0;
-            opacity: 0;
-            margin-bottom: 8px;
-            padding: 0;
-        }
+.collapsible-body.collapsed {
+    display: none; /* استخدام display:none لإخفاء العناصر بسلاسة عند الطي */
+    opacity: 0;
+    margin-bottom: 8px;
+    padding: 0;
+}
 
         .layers-list { display: flex; flex-direction: column; gap: 8px; }
         .layer-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 6px; }
