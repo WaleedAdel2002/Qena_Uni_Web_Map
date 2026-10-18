@@ -410,6 +410,42 @@
     <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
     <script>
+// استدعاء ملف GeoJSON وتنسيق الخطوط
+fetch('border.json')
+  .then(response => response.json())
+  .then(geojsonData => {
+    
+    // إنشاء طبقة الخط
+    var campusWallLayer = L.geoJSON(geojsonData, {
+      style: function(feature) {
+        return {
+          color: '#212529',       // لون الخط (أسود داكن)
+          weight: 4,              // سمك الخط بالبكسل
+          opacity: 0.9,           // درجة الشفافية (من 0 إلى 1)
+          dashArray: '6, 6',      // تجعل الخط منقطاً (حذف هذا السطر يجعله متصلاً)
+          lineCap: 'round',
+          lineJoin: 'round'
+        };
+      },
+      onEachFeature: function (feature, layer) {
+        // إضافة نافذة تفاعلية (Popup) تظهر ارتفاع السور أو اسمه عند النقر
+        var wallHeight = feature.properties.hight || 'غير محدد';
+        layer.bindPopup(`
+          <div style="text-align: right; direction: rtl;">
+            <h4 style="margin:0 0 5px 0;">سور جامعة جنوب الوادي</h4>
+            <p style="margin:0;">الارتفاع: <b>${wallHeight} أمتار</b></p>
+          </div>
+        `);
+      }
+    }).addTo(map);
+
+    // إضافة الطبقة لقائمة التحكم بالطبقات في الخريطة (إن وجدت)
+    if (typeof layerControl !== 'undefined') {
+      layerControl.addOverlay(campusWallLayer, "سور الجامعة");
+    }
+
+  })
+  .catch(error => console.error('حدث خطأ أثناء تحميل ملف السور:', error));
         // Default Layer Dictionary Palette
         const DEFAULT_LAYERS_DICT = [
             { id: 'construction', name: 'الإنشاءات والصيانة', color: '#ef4444', icon: 'fa-building' },
@@ -693,6 +729,7 @@
                 });
             }
         }
+
     </script>
 </body>
 </html>
