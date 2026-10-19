@@ -21,7 +21,7 @@ fetch('border.json')
         layer.bindPopup(`
           <div style="text-align: right; direction: rtl;">
             <h4 style="margin:0 0 5px 0;">سور جامعة جنوب الوادي</h4>
-            <p style="margin:0;">الارتفاع: <b>${wallHeight} أمتار</b></p>
+
           </div>
         `);
       }
