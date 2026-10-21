@@ -3,128 +3,275 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الخريطة التفاعلية لإنجازات جامعة جنوب الوادي 2023 - 2026</title>
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <!-- MarkerCluster CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <!-- Google Fonts (Cairo) -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-        <!-- Custom CSS -->
-    <link rel="stylesheet" href="style.css">
+    <title>الخريطة التفاعلية لإنجازات جامعة قنا 2023 - 2026</title>
+    <style>
+        :root {
+            --primary-color: #1a365d;
+            --accent-color: #2b6cb0;
+            --bg-color: #f7fafc;
+            --card-bg: #ffffff;
+            --text-color: #2d3748;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --radius: 12px;
+        }
 
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding-bottom: 40px;
+        }
+
+        header {
+            background-color: var(--card-bg);
+            box-shadow: var(--shadow);
+            padding: 1px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo-container {
+            width: 120px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .header-title {
+            text-align: center;
+            flex-grow: 1;
+            padding: 0 20px;
+        }
+
+        .header-title h1 {
+            font-size: 1.6rem;
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        .nav-container {
+            text-align: center;
+            margin: 25px 0;
+        }
+
+        .map-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background-color: var(--primary-color);
+            color: #ffffff;
+            padding: 12px 28px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .map-btn:hover {
+            background-color: var(--accent-color);
+            transform: translateY(-2px);
+        }
+
+        .map-btn svg {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+        }
+
+        main {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .video-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            margin-bottom: 25px;
+        }
+
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            background-color: #000;
+        }
+
+        .video-wrapper video {
+            width: 100%;
+            display: block;
+        }
+
+        .video-info {
+            padding: 15px 20px;
+        }
+
+        .video-info h3 {
+            font-size: 1.1rem;
+            color: var(--primary-color);
+        }
+
+        .featured-video {
+            margin-bottom: 30px;
+        }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .video-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
 
-    <header class="top-header">
-        <div class="brand-title">
-            <img src="Image/logo.png" alt="شعار الجامعة" class="univ-logo" onerror="this.style.display='none';">
-            <div>
-                <h1>الخريطة التفاعلية لإنجازات جامعة قنا 2023 -2026</h1>
-            </div>
+    <header>
+        <!-- شعار جامعة قنا -->
+        <div class="logo-container">
+            <img src="Image/logo.png" alt="شعار جامعة قنا" onerror="this.src='image/logo.png';">
         </div>
 
-        <div class="header-controls">
-            <div class="map-type-selector">
-                <button class="map-type-btn active" id="btn-satellite" onclick="switchMapLayer('satellite')">
-                    <i class="fa-solid fa-satellite"></i> صورة جوية 
-                </button>
-                <button class="map-type-btn" id="btn-streets" onclick="switchMapLayer('streets')">
-                    <i class="fa-solid fa-map"></i> خرائط الطرق
-                </button>
-            </div>
+        <!-- العنوان -->
+        <div class="header-title">
+            <h1>الخريطة التفاعلية لإنجازات جامعة قنا 2023 - 2026</h1>
+        </div>
+
+        <div class="logo-container">
+            <img src="Image/مسيرة.png" alt="شعار مسيرة" onerror="this.src='Image/مسيرة.jpg';">
         </div>
     </header>
 
-    <div class="app-container">
-        
-        <!-- زر فتح القائمة الجانبية المحدث والافتراضي ظهوره -->
-        <button class="open-sidebar-btn" id="open-sidebar-btn" onclick="toggleSidebar(false)">
-            <i class="fa-solid fa-bars"></i> عرض قائمة الإنجازات
-        </button>
-
-        <!-- الشريط الجانبي ومزود بكلاس collapsed افتراضياً ليظل مخفياً -->
-        <aside class="sidebar collapsed" id="sidebar">
-            <div class="sidebar-header">
-                <div class="stats-card">
-                    <div class="stat-box">
-                        <div class="number" id="total-count">0</div>
-                        <div class="label">إجمالي الإنجازات</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="number" id="active-layers-count">0</div>
-                        <div class="label">طبقات مفعلة</div>
-                    </div>
-                </div>
-                <button class="toggle-btn" title="إغلاق القائمة" onclick="toggleSidebar(true)">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-
-            <div class="sidebar-content">
-
-                <!-- Search Input Field -->
-                <div class="search-box">
-                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                    <input type="text" class="search-input" id="search-input" placeholder="بحث في الإنجازات والمشاريع..." oninput="filterData()">
-                </div>
-                
-                <!-- Section 1: Layers -->
-                <div class="section-header" onclick="toggleSection('layers-body', this)">
-                    <span><i class="fa-solid fa-layer-group"></i> طبقات الإنجازات</span>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <button style="background:none; border:none; color:var(--primary-color); cursor:pointer; font-size:0.75rem; font-weight:700;" onclick="event.stopPropagation(); toggleAllLayers(true)">تحديد الكل</button>
-                        <i class="fa-solid fa-chevron-down chevron"></i>
-                    </div>
-                </div>
-                <div class="collapsible-body" id="layers-body">
-                    <div class="layers-list" id="layers-container"></div>
-                </div>
-
-                <!-- Section 2: Date Filter -->
-                <div class="section-header" onclick="toggleSection('filter-body', this)">
-                    <span><i class="fa-solid fa-filter"></i> تصفية حسب الفترة الزمنية</span>
-                    <i class="fa-solid fa-chevron-down chevron"></i>
-                </div>
-                <div class="collapsible-body" id="filter-body">
-                    <div class="filter-box">
-                        <div class="date-inputs">
-                            <div class="form-group">
-                                <label>من:</label>
-                                <input type="date" class="form-control" id="filter-start-date" value="2023-07-01" onchange="filterData()">
-                            </div>
-                            <div class="form-group">
-                                <label>إلى:</label>
-                                <input type="date" class="form-control" id="filter-end-date" value="2026-08-31" onchange="filterData()">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Section 3: Achievements List -->
-                <div class="section-header" onclick="toggleSection('achievements-body', this)">
-                    <span><i class="fa-solid fa-list-check"></i> قائمة الإنجازات المسجلة</span>
-                    <i class="fa-solid fa-chevron-down chevron"></i>
-                </div>
-                <div class="collapsible-body" id="achievements-body">
-                    <div class="achievements-list" id="achievements-container"></div>
-                </div>
-
-            </div>
-        </aside>
-
-        <main id="map"></main>
+    <!-- زر الخريطة التفاعلية -->
+    <div class="nav-container">
+        <a href="Map.html" class="map-btn">
+            <svg viewBox="0 0 24 24">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+            </svg>
+            الخريطة التفاعلية
+        </a>
     </div>
 
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- MarkerCluster JS -->
-    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
-    <!-- Custom JS -->
-    <script src="script.js"></script>
+    <main>
+        <!-- الفيديو الرئيسي -->
+        <section class="featured-video">
+            <div class="video-card">
+                <div class="video-wrapper">
+                    <video id="mainVideo" controls autoplay muted playsinline>
+                        <source src="Video/فيديو موقع جامعة قنا 2026جديد.mp4" type="video/mp4">
+                        <source src="video/video1.mp4" type="video/mp4">
+                        متصفحك لا يدعم تشغيل الفيديو.
+                    </video>
+                </div>
+                <div class="video-info">
+                    <h3>فيديو موقع جامعة قنا 2026</h3>
+                </div>
+            </div>
+        </section>
 
+        <!-- شبكة الفيديوهات -->
+        <section class="video-grid">
+            <div class="video-card">
+                <div class="video-wrapper">
+                    <video controls>
+                        <source src="https://svuedu-my.sharepoint.com/:v:/g/personal/quality_svu_svu_edu_eg/IQD7xk9zi7eyRZ6u7uSYMyUKAS0WznPbHjuu9kAGXvjccP0?download=1" type="video/mp4">
+                        <source src="video/video2.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div class="video-info">
+                    <h3>تطبيق عدل</h3>
+                </div>
+            </div>
+
+            <div class="video-card">
+                <div class="video-wrapper">
+                    <video controls>
+                        <source src="Video/video3.mp4" type="video/mp4">
+                        <source src="video/video3.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div class="video-info">
+                    <h3>فيديو 2 </h3>
+                </div>
+            </div>
+
+            <div class="video-card">
+                <div class="video-wrapper">
+                    <video controls>
+                        <source src="Video/video4.mp4" type="video/mp4">
+                        <source src="video/video4.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div class="video-info">
+                    <h3>فيديو 3</h3>
+                </div>
+            </div>
+
+            <div class="video-card">
+                <div class="video-wrapper">
+                    <video controls>
+                        <source src="Video/video5.mp4" type="video/mp4">
+                        <source src="video/video5.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div class="video-info">
+                    <h3>فيديو 4 </h3>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const mainVideo = document.getElementById('mainVideo');
+
+            if (mainVideo) {
+                mainVideo.play().catch(error => {
+                    console.log('التشغيل التلقائي يتطلب الميوت:', error);
+                });
+            }
+
+            const allVideos = document.querySelectorAll('video');
+            allVideos.forEach(video => {
+                video.addEventListener('play', () => {
+                    allVideos.forEach(otherVideo => {
+                        if (otherVideo !== video) {
+                            otherVideo.pause();
+                        }
+                    });
+                });
+            });
+        });
+    </script>
 </body>
 </html>
