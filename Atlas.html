@@ -22,65 +22,167 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
         body { background-color: var(--bg-body); color: #1e293b; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
+        /* الهيدر العلوي المتناسق */
         header {
             background: #ffffff;
             border-bottom: 2px solid var(--border-color);
-            padding: 10px 4%;
+            padding: 8px 24px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            height: 70px;
+            min-height: 65px;
+            gap: 15px;
+            flex-shrink: 0;
+            z-index: 10;
         }
-        .logo-box { width: 90px; height: 50px; }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .logo-box { 
+            width: 70px; 
+            height: 45px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            flex-shrink: 0;
+        }
         .logo-box img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        .header-title h1 { font-size: 1.2rem; font-weight: 800; color: var(--primary); text-align: center; }
+        
+        .header-title { 
+            flex: 1; 
+            text-align: center;
+        }
+        
+        .header-title h1 { 
+            font-size: 1.25rem; 
+            font-weight: 800; 
+            color: var(--primary); 
+            line-height: 1.2; 
+        }
+
+        .header-title .sub-date {
+            display: block;
+            font-size: 0.85rem;
+            color: #2563eb;
+            font-weight: 700;
+            margin-top: 2px;
+        }
         
         .nav-back {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             background: #e2e8f0;
             color: var(--primary);
-            padding: 6px 16px;
+            padding: 7px 16px;
             border-radius: 20px;
             text-decoration: none;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
             font-weight: 700;
+            white-space: nowrap;
             transition: all 0.2s;
+            flex-shrink: 0;
         }
         .nav-back:hover { background: #cbd5e1; }
 
-        .layout-container {
-            display: grid;
-            grid-template-columns: 320px 1fr;
-            gap: 16px;
-            padding: 16px;
-            flex: 1;
-            min-height: 0;
+        /* زر فتح/إغلاق القائمة الجانبية */
+        .toggle-sidebar-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--accent-blue);
+            color: #ffffff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 3px 8px rgba(30, 64, 175, 0.25);
+            white-space: nowrap;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
         }
 
+        .toggle-sidebar-btn:hover {
+            background: #1d4ed8;
+        }
+
+        /* الحاوية الرئيسية للتخطيط */
+        .layout-container {
+            display: flex;
+            gap: 16px;
+            padding: 16px 24px;
+            flex: 1;
+            min-height: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* القائمة الجانبية في سطح المكتب: مثبتة بجانب الخريطة بشكل أنيق */
         .sidebar {
+            width: 320px;
             background: var(--card-bg);
             border-radius: var(--radius-lg);
             border: 1px solid var(--border-color);
-            padding: 14px;
+            padding: 16px;
             display: flex;
             flex-direction: column;
             gap: 12px;
             height: 100%;
             min-height: 0;
+            flex-shrink: 0;
+            box-shadow: var(--shadow-subtle);
+            transition: margin-right 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
+            position: relative;
+            z-index: 5;
         }
 
-        .sidebar h3 {
-            font-size: 1rem;
+        /* عند طي القائمة في سطح المكتب تنزلق للخارج بسلاسة */
+        .layout-container.sidebar-closed .sidebar {
+            margin-right: -336px;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .sidebar-header h3 {
+            font-size: 1.02rem;
             font-weight: 800;
             color: var(--primary);
-            padding-bottom: 8px;
-            border-bottom: 2px solid #f1f5f9;
             display: flex;
             align-items: center;
             gap: 8px;
+            white-space: nowrap;
         }
+
+        .close-sidebar-btn {
+            background: #f1f5f9;
+            color: #64748b;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .close-sidebar-btn:hover { background: #ef4444; color: #fff; }
 
         .item-list {
             display: flex;
@@ -88,18 +190,21 @@
             gap: 8px;
             overflow-y: auto;
             flex: 1;
+            padding-left: 2px;
         }
 
         .list-item {
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 12px;
+            padding: 11px 14px;
             border-radius: var(--radius-md);
             border: 1px solid #e2e8f0;
             background: #f8fafc;
             cursor: pointer;
             transition: all 0.2s ease;
+            font-size: 0.92rem;
+            font-weight: 600;
         }
 
         .list-item:hover, .list-item.active {
@@ -110,6 +215,7 @@
         .list-item.active {
             border-right: 4px solid var(--accent-blue);
             font-weight: 800;
+            color: var(--accent-blue);
         }
 
         .item-icon {
@@ -117,14 +223,22 @@
             height: 32px;
             background: #dbeafe;
             color: var(--accent-blue);
-            border-radius: 6px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 0.9rem;
+            flex-shrink: 0;
         }
 
+        .list-item.active .item-icon {
+            background: var(--accent-blue);
+            color: #ffffff;
+        }
+
+        /* شاشة عرض الخريطة الرئيسية */
         .main-display {
+            flex: 1;
             background: #0f172a;
             border-radius: var(--radius-lg);
             border: 1px solid var(--border-color);
@@ -133,29 +247,40 @@
             align-items: center;
             justify-content: center;
             overflow: hidden;
+            height: 100%;
+            min-width: 0;
         }
 
         .main-display img {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
+            display: block;
         }
 
         .zoom-btn {
             position: absolute;
             top: 15px;
             left: 15px;
-            background: rgba(30, 64, 175, 0.9);
+            background: rgba(30, 64, 175, 0.92);
             color: #fff;
             border: none;
             padding: 8px 16px;
             border-radius: 8px;
             font-weight: bold;
+            font-size: 0.85rem;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 6px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 5;
+            transition: all 0.2s ease;
+        }
+
+        .zoom-btn:hover {
+            background: #1d4ed8;
+            transform: scale(1.03);
         }
 
         /* Fullscreen Modal */
@@ -163,36 +288,120 @@
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.92);
+            background: rgba(0,0,0,0.95);
             z-index: 9999;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 15px;
         }
-        .modal img { max-width: 95vw; max-height: 90vh; object-fit: contain; }
-        .close-modal { position: absolute; top: 20px; left: 30px; color: #fff; font-size: 35px; cursor: pointer; }
+        .modal img { max-width: 98vw; max-height: 94vh; object-fit: contain; }
+        .close-modal { position: absolute; top: 15px; left: 20px; color: #fff; font-size: 32px; cursor: pointer; }
+
+        /* شاشات الموبايل والأجهزة اللوحية */
+        @media (max-width: 992px) {
+            header {
+                padding: 6px 12px;
+                gap: 8px;
+            }
+
+            .logo-box { width: 45px; height: 32px; }
+
+            .header-title h1 {
+                font-size: 0.85rem;
+            }
+
+            .header-title .sub-date {
+                font-size: 0.72rem;
+            }
+
+            .nav-back {
+                padding: 5px 10px;
+                font-size: 0.75rem;
+            }
+
+            .toggle-sidebar-btn {
+                padding: 6px 10px;
+                font-size: 0.8rem;
+            }
+
+            .layout-container {
+                padding: 10px;
+            }
+
+            /* في الموبايل فقط تحول لقائمة منزلقة فوق الشاشة Drawer */
+            .sidebar {
+                position: fixed;
+                top: 0;
+                right: 0;
+                width: 82%;
+                max-width: 300px;
+                height: 100vh;
+                z-index: 100;
+                border-radius: 0;
+                box-shadow: -5px 0 25px rgba(0,0,0,0.3);
+                transform: translateX(100%);
+                margin-right: 0 !important;
+                opacity: 1 !important;
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(15, 23, 42, 0.65);
+                backdrop-filter: blur(3px);
+                z-index: 90;
+            }
+
+            .sidebar-overlay.active {
+                display: block;
+            }
+        }
     </style>
 </head>
 <body>
 
     <header>
-        <div style="display: flex; align-items: center; gap: 15px;">
+        <div class="header-right">
             <a href="index.html" class="nav-back"><i class="fa-solid fa-arrow-right"></i> الرئيسية</a>
+            
+            <!-- زر فتح/إغلاق قائمة الخرائط الجانبية -->
+            <button class="toggle-sidebar-btn" id="toggleBtn" onclick="toggleSidebar()">
+                <i class="fa-solid fa-bars-staggered"></i> قائـمة الخرائط
+            </button>
+
             <div class="logo-box">
                 <img src="Image/logo.png" alt="شعار الجامعة" onerror="this.src='Image/logo.png';">
             </div>
         </div>
+
         <div class="header-title">
-            <h1>الأطلس الرقمي لإنجازات جامعة قنا ( 2023 - 2026 )</h1>
+            <h1>الأطلس الرقمي لإنجازات جامعة قنا</h1>
+            <span class="sub-date">( 2023 - 2026 )</span>
         </div>
+
         <div class="logo-box">
             <img src="Image/مسيرة.png" alt="شعار مسيرة" onerror="this.src='Image/مسيرة.jpg';">
         </div>
     </header>
 
-    <div class="layout-container">
-        <div class="sidebar">
-            <h3><i class="fa-solid fa-book-atlas"></i> خرائط الأطلس الرقمي</h3>
+    <div class="layout-container" id="layoutContainer">
+        
+        <!-- خلفية معتمة للموبايل -->
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+        <!-- القائمة الجانبية (مثبتة بجانب الخريطة في الكمبيوتر) -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h3><i class="fa-solid fa-book-atlas"></i> خرائط الأطلس الرقمي</h3>
+                <button class="close-sidebar-btn" onclick="toggleSidebar()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
             <div class="item-list">
                 <div class="list-item active" onclick="loadMap('atlas/الموقع العام .jpg', 'الموقع العام للجامعة')">
                     <div class="item-icon"><i class="fa-solid fa-map"></i></div>
@@ -218,42 +427,37 @@
                     <div class="item-icon"><i class="fa-solid fa-road"></i></div>
                     <div>شبكة الطرق والبوابات</div>
                 </div>
-
                 <div class="list-item" onclick="loadMap('atlas/الخدمات اللوجستية.jpg', 'الخدمات اللوجستية والمرافق')">
                     <div class="item-icon"><i class="fa-solid fa-truck-ramp-box"></i></div>
                     <div>الخدمات اللوجستية والمرافق</div>
                 </div>
-                
-                 <div class="list-item" onclick="loadMap('atlas/الأدلة التنظيمية.jpg', 'الأدلة التنظيمية  ')">
-                    <div class="item-icon"><i class="fa-solid fa-truck-ramp-box"></i></div>
-                    <div>الأدلة التنظيمية  </div>
+                <div class="list-item" onclick="loadMap('atlas/الأدلة التنظيمية.jpg', 'الأدلة التنظيمية')">
+                    <div class="item-icon"><i class="fa-solid fa-sitemap"></i></div>
+                    <div>الأدلة التنظيمية</div>
                 </div>
-
-
-
-                <div class="list-item" onclick="loadMap('atlas/مباني ومرافق الجامعة.jpg', 'مباني ومرافق الجامعة   ')">
-                    <div class="item-icon"><i class="fa-solid fa-truck-ramp-box"></i></div>
-                    <div>مباني ومرافق الجامعة   </div>
+                <div class="list-item" onclick="loadMap('atlas/مباني ومرافق الجامعة.jpg', 'مباني ومرافق الجامعة')">
+                    <div class="item-icon"><i class="fa-solid fa-building"></i></div>
+                    <div>مباني ومرافق الجامعة</div>
                 </div>
-                 <div class="list-item" onclick="loadMap('atlas/مظلة سيارات.jpg', 'مظلة سيارات   ')">
-                    <div class="item-icon"><i class="fa-solid fa-truck-ramp-box"></i></div>
-                    <div>مظلة سيارات   </div>
+                <div class="list-item" onclick="loadMap('atlas/مظلة سيارات.jpg', 'مظلة سيارات')">
+                    <div class="item-icon"><i class="fa-solid fa-square-parking"></i></div>
+                    <div>مظلة سيارات</div>
                 </div>               
-                <div class="list-item" onclick="loadMap('https://artsvuedu-my.sharepoint.com/:i:/g/personal/waleedadel_art_svu_edu_eg/IQBAUwJLi5QgS6_-8i7UsDrpAfzfjOS8nrVuitZea0UQ1HI?download=1', ' مظلة طلاب  ')">
-                    <div class="item-icon"><i class="fa-solid fa-truck-ramp-box"></i></div>
-                    <div> مظلة طلاب  </div>
+                <div class="list-item" onclick="loadMap('https://artsvuedu-my.sharepoint.com/:i:/g/personal/waleedadel_art_svu_edu_eg/IQBAUwJLi5QgS6_-8i7UsDrpAfzfjOS8nrVuitZea0UQ1HI?download=1', 'مظلة طلاب')">
+                    <div class="item-icon"><i class="fa-solid fa-umbrella"></i></div>
+                    <div>مظلة طلاب</div>
                 </div>
-
-
             </div>
         </div>
 
+        <!-- منطقة عرض الخريطة -->
         <div class="main-display">
             <button class="zoom-btn" onclick="openModal()"><i class="fa-solid fa-expand"></i> تكبير الصورة</button>
             <img id="currentImage" src="atlas/الموقع العام .jpg" alt="خريطة الأطلس">
         </div>
     </div>
 
+    <!-- نافذة ملء الشاشة -->
     <div id="imageModal" class="modal" onclick="closeModal()">
         <span class="close-modal">&times;</span>
         <img id="modalImg" src="atlas/الموقع العام .jpg" alt="صورة مكبرة">
@@ -266,7 +470,35 @@
             activeSrc = src;
             document.getElementById('currentImage').src = src;
             document.querySelectorAll('.list-item').forEach(el => el.classList.remove('active'));
-            event.currentTarget.classList.add('active');
+            if (window.event && window.event.currentTarget) {
+                window.event.currentTarget.classList.add('active');
+            }
+            // إغلاق القائمة الجانبية تلقائياً على الموبايل بعد الاختيار
+            if (window.innerWidth <= 992) {
+                closeSidebar();
+            }
+        }
+
+        function toggleSidebar() {
+            const container = document.getElementById('layoutContainer');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+
+            if (window.innerWidth <= 992) {
+                // وضع الموبايل: فتح/إغلاق القائمة فوق الشاشة
+                sidebar.classList.toggle('mobile-open');
+                overlay.classList.toggle('active');
+            } else {
+                // وضع الكمبيوتر: إخفاء/إظهار القائمة الجانبية بجانب الخريطة
+                container.classList.toggle('sidebar-closed');
+            }
+        }
+
+        function closeSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.remove('mobile-open');
+            overlay.classList.remove('active');
         }
 
         function openModal() {
