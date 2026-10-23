@@ -21,7 +21,7 @@ fetch('border.json')
         layer.bindPopup(`
           <div style="text-align: right; direction: rtl;">
             <h4 style="margin:0 0 5px 0;">سور جامعة جنوب الوادي</h4>
-
+            <p style="margin:0;">الارتفاع: <b>${wallHeight} أمتار</b></p>
           </div>
         `);
       }
@@ -209,30 +209,34 @@ fetch('border.json')
         }
 
         function getFilteredAchievements() {
-            const searchText = document.getElementById('search-input').value.trim().toLowerCase();
-            const startDate = document.getElementById('filter-start-date').value;
-            const endDate = document.getElementById('filter-end-date').value;
+    const searchText = document.getElementById('search-input') ? document.getElementById('search-input').value.trim().toLowerCase() : '';
+    
+    // التحقق من وجود عناصر التاريخ في HTML قبل قراءة قيمتها لمنع التوقف
+    const startDateEl = document.getElementById('filter-start-date');
+    const endDateEl = document.getElementById('filter-end-date');
+    const startDate = startDateEl ? startDateEl.value : '';
+    const endDate = endDateEl ? endDateEl.value : '';
 
-            return achievements.filter(item => {
-                const isLayerActive = activeLayers.has(item.layerId);
-                const isDateValid = (!startDate || !item.date || item.date >= startDate) && (!endDate || !item.date || item.date <= endDate);
-                
-                // Search Filter
-                let matchesSearch = true;
-                if (searchText !== '') {
-                    const titleMatch = item.title && item.title.toLowerCase().includes(searchText);
-                    const descMatch = item.description && item.description.toLowerCase().includes(searchText);
-                    
-                    let customMatch = false;
-                    if (item.customFields && typeof item.customFields === 'object') {
-                        customMatch = Object.values(item.customFields).some(val => val && val.toString().toLowerCase().includes(searchText));
-                    }
-                    matchesSearch = titleMatch || descMatch || customMatch;
-                }
-
-                return isLayerActive && isDateValid && matchesSearch;
-            });
+    return achievements.filter(item => {
+        const isLayerActive = activeLayers.has(item.layerId);
+        const isDateValid = (!startDate || !item.date || item.date >= startDate) && (!endDate || !item.date || item.date <= endDate);
+        
+        // Search Filter
+        let matchesSearch = true;
+        if (searchText !== '') {
+            const titleMatch = item.title && item.title.toLowerCase().includes(searchText);
+            const descMatch = item.description && item.description.toLowerCase().includes(searchText);
+            
+            let customMatch = false;
+            if (item.customFields && typeof item.customFields === 'object') {
+                customMatch = Object.values(item.customFields).some(val => val && val.toString().toLowerCase().includes(searchText));
+            }
+            matchesSearch = titleMatch || descMatch || customMatch;
         }
+
+        return isLayerActive && isDateValid && matchesSearch;
+    });
+}
 
         function filterData() {
             renderAchievementsList();
@@ -246,12 +250,21 @@ fetch('border.json')
             filterData();
         }
 
-        function toggleAllLayers(status) {
-            if (status) detectedLayers.forEach(l => activeLayers.add(l.id));
-            else activeLayers.clear();
-            renderLayerControls();
-            filterData();
-        }
+function toggleAllLayers() {
+    // التحقق مما إذا كانت جميع الطبقات المفحوصة محددة حالياً
+    const areAllSelected = detectedLayers.length > 0 && activeLayers.size === detectedLayers.length;
+
+    if (areAllSelected) {
+        // إذا كانت جميعها محددة، قم بإلغاء التحديد عن الجميع
+        activeLayers.clear();
+    } else {
+        // إذا كانت هناك طبقات غير محددة، قم بتحديد جميع الطبقات
+        detectedLayers.forEach(l => activeLayers.add(l.id));
+    }
+
+    renderLayerControls();
+    filterData();
+}
 
         function updateMapMarkers() {
             markersClusterGroup.clearLayers();
@@ -276,14 +289,25 @@ fetch('border.json')
                 let audioHTML = item.audio ? `<audio controls src="${item.audio}"></audio>` : '';
                 let dateHTML = item.date ? `<div class="date"><i class="fa-regular fa-calendar"></i> ${item.date}</div>` : '';
 
-                let dynamicFieldsHTML = '';
-                if (item.customFields && typeof item.customFields === 'object') {
-                    Object.entries(item.customFields).forEach(([k, v]) => {
-                        if (v && v.trim() !== '') {
-                            dynamicFieldsHTML += `<div class="field-item"><span>${k}:</span> ${v}</div>`;
-                        }
-                    });
-                }
+let dynamicFieldsHTML = '';
+if (item.customFields && typeof item.customFields === 'object') {
+    Object.entries(item.customFields).forEach(([k, v]) => {
+        if (v && v.toString().trim() !== '') {
+            let textValue = v.toString();
+
+            // تعبير نمطي (Regex) للتعرف على أي رابط داخل النص سواء كان يبدأ بـ http/https أو www
+            const urlPattern = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])|(\bwww\.[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+
+            // تحويل الروابط المكتشفة داخل النص إلى عناصر <a> قابلة للنقر
+            const formattedValue = textValue.replace(urlPattern, function(match) {
+                const href = match.startsWith('www.') ? 'http://' + match : match;
+                return `<a href="${href}" target="_blank" rel="noopener noreferrer" style="color: #1e3a8a; font-weight: bold; text-decoration: underline;">${match} <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.7rem;"></i></a>`;
+            });
+
+            dynamicFieldsHTML += `<div class="field-item"><span>${k}:</span> ${formattedValue}</div>`;
+        }
+    });
+}
 
                 const popupHTML = `
                     <div class="popup-card">
