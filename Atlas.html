@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الأطلس الرقمي لإنجازات جامعة قنا</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-body: #f8fafc;
+            --card-bg: #ffffff;
+            --primary: #0f172a;
+            --accent-blue: #1e40af;
+            --border-color: #cbd5e1;
+            --radius-lg: 14px;
+            --radius-md: 10px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
+        body { background-color: var(--bg-body); color: #1e293b; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+        header {
+            background: #ffffff;
+            border-bottom: 2px solid var(--border-color);
+            padding: 10px 4%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 70px;
+        }
+        .logo-box { width: 90px; height: 50px; }
+        .logo-box img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .header-title h1 { font-size: 1.2rem; font-weight: 800; color: var(--primary); text-align: center; }
+        
+        .nav-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #e2e8f0;
+            color: var(--primary);
+            padding: 6px 16px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 700;
+            transition: all 0.2s;
+        }
+        .nav-back:hover { background: #cbd5e1; }
+
+        .layout-container {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 16px;
+            padding: 16px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .sidebar {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            height: 100%;
+            min-height: 0;
+        }
+
+        .sidebar h3 {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--primary);
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .item-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .list-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            border-radius: var(--radius-md);
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .list-item:hover, .list-item.active {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+        }
+
+        .list-item.active {
+            border-right: 4px solid var(--accent-blue);
+            font-weight: 800;
+        }
+
+        .item-icon {
+            width: 32px;
+            height: 32px;
+            background: #dbeafe;
+            color: var(--accent-blue);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        .main-display {
+            background: #0f172a;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .main-display img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .zoom-btn {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(30, 64, 175, 0.9);
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        /* Fullscreen Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.92);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal img { max-width: 95vw; max-height: 90vh; object-fit: contain; }
+        .close-modal { position: absolute; top: 20px; left: 30px; color: #fff; font-size: 35px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <a href="index.html" class="nav-back"><i class="fa-solid fa-arrow-right"></i> الرئيسية</a>
+            <div class="logo-box">
+                <img src="Image/logo.png" alt="شعار الجامعة" onerror="this.src='Image/logo.png';">
+            </div>
+        </div>
+        <div class="header-title">
+            <h1>الأطلس الرقمي لإنجازات جامعة قنا ( 2023 - 2026 )</h1>
+        </div>
+        <div class="logo-box">
+            <img src="Image/مسيرة.png" alt="شعار مسيرة" onerror="this.src='Image/مسيرة.jpg';">
+        </div>
+    </header>
+
+    <div class="layout-container">
+        <div class="sidebar">
+            <h3><i class="fa-solid fa-book-atlas"></i> خرائط الأطلس الرقمي</h3>
+            <div class="item-list">
+                <div class="list-item active" onclick="loadMap('atlas/الموقع العام .jpg', 'الموقع العام للجامعة')">
+                    <div class="item-icon"><i class="fa-solid fa-map"></i></div>
+                    <div>الموقع العام للجامعة</div>
+                </div>
+                <div class="list-item" onclick="loadMap('atlas/البنية التحتية.jpg', 'البنية التحتية والشبكات')">
+                    <div class="item-icon"><i class="fa-solid fa-network-wired"></i></div>
+                    <div>البنية التحتية والشبكات</div>
+                </div>
+                <div class="list-item" onclick="loadMap('atlas/الإنشاءات والصيانة.jpg', 'الإنشاءات والصيانة')">
+                    <div class="item-icon"><i class="fa-solid fa-building-gear"></i></div>
+                    <div>الإنشاءات والصيانة</div>
+                </div>
+                <div class="list-item" onclick="loadMap('atlas/البيئة التعليمية.jpg', 'تطوير البيئة التعليمية')">
+                    <div class="item-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+                    <div>تطوير البيئة التعليمية</div>
+                </div>
+                <div class="list-item" onclick="loadMap('atlas/التحول الرقمي.jpg', 'مشروعات التحول الرقمي')">
+                    <div class="item-icon"><i class="fa-solid fa-laptop-code"></i></div>
+                    <div>مشروعات التحول الرقمي</div>
+                </div>
+                <div class="list-item" onclick="loadMap('atlas/الطرق والبوابات.jpg', 'شبكة الطرق والبوابات')">
+                    <div class="item-icon"><i class="fa-solid fa-road"></i></div>
+                    <div>شبكة الطرق والبوابات</div>
+                </div>
+
+                <div class="list-item" onclick="loadMap('atlas/الخدمات اللوجستية.jpg', 'الخدمات اللوجستية والمرافق')">
+                    <div class="item-icon"><i class="fa-solid fa-truck-ramp-box"></i></div>
+                    <div>الخدمات اللوجستية والمرافق</div>
+                </div>
+                
+                 <div class="list-item" onclick="loadMap('atlas/الأدلة التنظيمية.jpg', 'الأدلة التنظيمية  ')">
+                    <div class="item-icon"><i class="fa-solid fa-truck-ramp-box"></i></div>
+                    <div>الأدلة التنظيمية  </div>
+                </div>
+
+
+
+                <div class="list-item" onclick="loadMap('atlas/مباني ومرافق الجامعة.jpg', 'مباني ومرافق الجامعة   ')">
+                    <div class="item-icon"><i class="fa-solid fa-truck-ramp-box"></i></div>
+                    <div>مباني ومرافق الجامعة   </div>
+                </div>
+                 <div class="list-item" onclick="loadMap('atlas/مظلة سيارات.jpg', 'مظلة سيارات   ')">
+                    <div class="item-icon"><i class="fa-solid fa-truck-ramp-box"></i></div>
+                    <div>مظلة سيارات   </div>
+                </div>               
+                <div class="list-item" onclick="loadMap('atlas/مظلة طلاب.jpg', ' مظلة طلاب  ')">
+                    <div class="item-icon"><i class="fa-solid fa-truck-ramp-box"></i></div>
+                    <div> مظلة طلاب  </div>
+                </div>
+
+
+            </div>
+        </div>
+
+        <div class="main-display">
+            <button class="zoom-btn" onclick="openModal()"><i class="fa-solid fa-expand"></i> تكبير الصورة</button>
+            <img id="currentImage" src="atlas/الموقع العام .jpg" alt="خريطة الأطلس">
+        </div>
+    </div>
+
+    <div id="imageModal" class="modal" onclick="closeModal()">
+        <span class="close-modal">&times;</span>
+        <img id="modalImg" src="atlas/الموقع العام .jpg" alt="صورة مكبرة">
+    </div>
+
+    <script>
+        let activeSrc = 'atlas/الموقع العام .jpg';
+
+        function loadMap(src, title) {
+            activeSrc = src;
+            document.getElementById('currentImage').src = src;
+            document.querySelectorAll('.list-item').forEach(el => el.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+        }
+
+        function openModal() {
+            document.getElementById('modalImg').src = activeSrc;
+            document.getElementById('imageModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

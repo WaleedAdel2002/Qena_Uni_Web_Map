@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الأفلام التوثيقية لإنجازات جامعة قنا</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-body: #f8fafc;
+            --card-bg: #ffffff;
+            --primary: #0f172a;
+            --accent-blue: #1e40af;
+            --border-color: #cbd5e1;
+            --radius-lg: 14px;
+            --radius-md: 10px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
+        body { background-color: var(--bg-body); color: #1e293b; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+        header {
+            background: #ffffff;
+            border-bottom: 2px solid var(--border-color);
+            padding: 10px 4%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 70px;
+        }
+        .logo-box { width: 90px; height: 50px; }
+        .logo-box img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .header-title h1 { font-size: 1.2rem; font-weight: 800; color: var(--primary); text-align: center; }
+        
+        .nav-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #e2e8f0;
+            color: var(--primary);
+            padding: 6px 16px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 700;
+            transition: all 0.2s;
+        }
+        .nav-back:hover { background: #cbd5e1; }
+
+        .layout-container {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 16px;
+            padding: 16px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .sidebar {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            height: 100%;
+            min-height: 0;
+        }
+
+        .sidebar h3 {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--primary);
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .item-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .list-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            border-radius: var(--radius-md);
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .list-item:hover, .list-item.active {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+        }
+
+        .list-item.active {
+            border-right: 4px solid var(--accent-blue);
+            font-weight: 800;
+        }
+
+        .item-icon {
+            width: 32px;
+            height: 32px;
+            background: #dbeafe;
+            color: var(--accent-blue);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        .main-display {
+            background: #000;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .video-wrapper {
+            flex: 1;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        video { width: 100%; height: 100%; object-fit: contain; }
+
+        .video-footer {
+            background: #ffffff;
+            padding: 12px 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .video-footer h2 { font-size: 1.1rem; color: var(--primary); font-weight: 800; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <a href="index.html" class="nav-back"><i class="fa-solid fa-arrow-right"></i> الرئيسية</a>
+            <div class="logo-box">
+                <img src="Image/logo.png" alt="شعار الجامعة" onerror="this.src='Image/logo.png';">
+            </div>
+        </div>
+        <div class="header-title">
+            <h1>الأفلام التوثيقية لإنجازات جامعة قنا ( 2023 - 2026 )</h1>
+        </div>
+        <div class="logo-box">
+            <img src="Image/مسيرة.png" alt="شعار مسيرة" onerror="this.src='Image/مسيرة.jpg';">
+        </div>
+    </header>
+
+    <div class="layout-container">
+        <div class="sidebar">
+            <h3><i class="fa-solid fa-film"></i> قائـمة الأفـلام التوثيقية</h3>
+            <div class="item-list">
+                <div class="list-item active" onclick="loadVideo('https://artsvuedu-my.sharepoint.com/:v:/g/personal/waleedadel_art_svu_edu_eg/IQDCu2FmPcUMTqLwNTOOmsz_AYKSd4dTsmTU17jWid7uALI?download=1', 'الفيلم التوثيقي الرئيسي لموقع جامعة قنا 2026')">
+                    <div class="item-icon"><i class="fa-solid fa-play"></i></div>
+                    <div>فيديو موقع جامعة قنا 2026</div>
+                </div>
+                <div class="list-item" onclick="loadVideo('video/video2.mp4', 'فيلم تطوير البنية التحتية والشبكات')">
+                    <div class="item-icon"><i class="fa-solid fa-play"></i></div>
+                    <div>تطوير البنية التحتية</div>
+                </div>
+                <div class="list-item" onclick="loadVideo('video/video3.mp4', 'فيلم المشاريع الهندسية والإنشاءات')">
+                    <div class="item-icon"><i class="fa-solid fa-play"></i></div>
+                    <div>المشاريع الهندسية والإنشاءات</div>
+                </div>
+                <div class="list-item" onclick="loadVideo('video/video4.mp4', 'فيلم التحول الرقمي والخدمات الإلكترونية')">
+                    <div class="item-icon"><i class="fa-solid fa-play"></i></div>
+                    <div>التحول الرقمي والخدمات</div>
+                </div>
+                <div class="list-item" onclick="loadVideo('video/video5.mp4', 'فيلم البيئة التعليمية والمرافق الجامعية')">
+                    <div class="item-icon"><i class="fa-solid fa-play"></i></div>
+                    <div>البيئة التعليمية والمرافق</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-display">
+            <div class="video-wrapper">
+                <video id="player" controls autoplay muted playsinline>
+                    <source id="playerSrc" src="https://artsvuedu-my.sharepoint.com/:v:/g/personal/waleedadel_art_svu_edu_eg/IQDCu2FmPcUMTqLwNTOOmsz_AYKSd4dTsmTU17jWid7uALI?download=1" type="video/mp4">
+                    متصفحك لا يدعم الفيديو.
+                </video>
+            </div>
+            <div class="video-footer">
+                <h2 id="videoTitle">الفيلم التوثيقي الرئيسي لموقع جامعة قنا 2026</h2>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function loadVideo(src, title) {
+            const player = document.getElementById('player');
+            const playerSrc = document.getElementById('playerSrc');
+            document.getElementById('videoTitle').innerText = title;
+            
+            playerSrc.src = src;
+            player.load();
+            player.play();
+
+            document.querySelectorAll('.list-item').forEach(el => el.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+        }
+    </script>
+</body>
+</html>
