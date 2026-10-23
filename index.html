@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>المنصة التفاعلية لإنجازات جامعة قنا 2023 - 2026</title>
+    <title>المنصة التفاعلية لإنجازات جامعة جنوب الوادي (قنا) 2023 - 2026</title>
     
     <!-- الخطوط والأيقونات -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,15 +13,16 @@
 
     <style>
         :root {
-            --bg-body: #f1f5f9;
+            --bg-body: #f8fafc;
             --card-bg: #ffffff;
             --primary: #0f172a;
-            --accent-blue: #2563eb;
-            --border-color: #e2e8f0;
+            --accent-blue: #1e40af;
+            --accent-hover: #1d4ed8;
+            --border-color: #cbd5e1;
             --text-main: #1e293b;
-            --radius-lg: 14px;
-            --radius-md: 10px;
-            --shadow-subtle: 0 4px 20px -2px rgba(15, 23, 42, 0.06);
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --shadow-subtle: 0 10px 25px -5px rgba(15, 23, 42, 0.08);
         }
 
         * {
@@ -31,28 +32,30 @@
             font-family: 'Cairo', sans-serif;
         }
 
-        html, body {
-            height: 100vh;
-            overflow: hidden;
+        body {
             background-color: var(--bg-body);
             color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
+        /* الهيدر العلوي */
         header {
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(8px);
-            border-bottom: 1px solid var(--border-color);
-            padding: 8px 3%;
+            background: #ffffff;
+            border-bottom: 2px solid var(--border-color);
+            padding: 12px 5%;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            height: 65px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            position: relative;
+            z-index: 10;
         }
 
         .logo-box {
-            width: 90px;
-            height: 50px;
+            width: 110px;
+            height: 65px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -64,312 +67,164 @@
             object-fit: contain;
         }
 
-        .header-title h1 {
-            font-size: 1.3rem;
-            font-weight: 800;
-            color: var(--primary);
+        .header-center {
             text-align: center;
-        }
-
-        .main-container {
-            max-width: 1350px;
-            margin: 0 auto;
-            padding: 12px 20px;
-            height: calc(100vh - 65px);
             display: flex;
             flex-direction: column;
-            gap: 12px;
-        }
-
-        .intro-banner {
-            background: var(--card-bg);
-            border-radius: var(--radius-lg);
-            padding: 12px 22px;
-            box-shadow: var(--shadow-subtle);
-            border: 1px solid var(--border-color);
-            border-right: 5px solid var(--accent-blue);
-            display: flex;
             align-items: center;
-            justify-content: space-between;
-            gap: 15px;
-            flex-shrink: 0;
+            gap: 4px;
         }
 
-        .intro-banner p {
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: #334155;
-            line-height: 1.5;
+        .project-badge {
+            max-height: 55px;
+            width: auto;
+            object-fit: contain;
+            margin-bottom: 4px;
         }
 
-        .map-action-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--accent-blue);
-            color: #ffffff;
-            padding: 10px 22px;
-            border-radius: 30px;
-            text-decoration: none;
-            font-size: 0.95rem;
+        .header-title h1 {
+            font-size: 1.25rem;
             font-weight: 800;
-            white-space: nowrap;
-            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .map-action-btn:hover {
-            background: #1d4ed8;
-            transform: translateY(-2px);
-        }
-
-        .showcase-layout {
-            display: grid;
-            grid-template-columns: 320px 1fr;
-            gap: 16px;
-            flex-grow: 1;
-            min-height: 0;
-        }
-
-        .playlist-panel {
-            background: var(--card-bg);
-            border-radius: var(--radius-lg);
-            padding: 14px;
-            box-shadow: var(--shadow-subtle);
-            border: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            min-height: 0;
-        }
-
-        .playlist-panel h3 {
-            font-size: 1rem;
-            font-weight: 800;
-            color: var(--primary);
-            margin-bottom: 10px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #f1f5f9;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-shrink: 0;
-        }
-
-        .playlist-items {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            overflow-y: auto;
-            flex-grow: 1;
-            padding-left: 4px;
-        }
-
-        .playlist-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px;
-            border-radius: var(--radius-md);
-            border: 1px solid #f1f5f9;
-            background: #f8fafc;
-            cursor: pointer;
-            transition: all 0.25s ease;
-        }
-
-        .playlist-item:hover, .playlist-item.active {
-            background: #eff6ff;
-            border-color: #bfdbfe;
-        }
-
-        .playlist-item.active {
-            border-right: 4px solid var(--accent-blue);
-        }
-
-        .thumb-icon {
-            width: 36px;
-            height: 36px;
-            background: #dbeafe;
-            color: var(--accent-blue);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.95rem;
-            flex-shrink: 0;
-        }
-
-        .playlist-item.active .thumb-icon {
-            background: var(--accent-blue);
-            color: #ffffff;
-        }
-
-        .atlas-item .thumb-icon {
-            background: #fef3c7;
-            color: #d97706;
-        }
-
-        .atlas-item:hover, .atlas-item.active {
-            background: #fffbeb;
-            border-color: #fde68a;
-        }
-
-        .item-info h4 {
-            font-size: 0.88rem;
-            font-weight: 700;
             color: var(--primary);
             line-height: 1.3;
         }
 
-        .player-card {
-            background: var(--card-bg);
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            box-shadow: var(--shadow-subtle);
-            border: 1px solid var(--border-color);
+        .header-title .subtitle {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #2563eb;
+            margin-top: 2px;
+        }
+
+        /* الحاوية الرئيسية */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px 20px;
+            width: 100%;
+            flex: 1;
             display: flex;
             flex-direction: column;
-            height: 100%;
-            min-height: 0;
+            gap: 24px;
         }
 
-        .screen-wrapper {
-            position: relative;
-            width: 100%;
-            flex-grow: 1;
-            background: #000;
-            min-height: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        /* البانر التعريفي التوضيحي */
+        .intro-banner {
+            background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+            border-radius: var(--radius-lg);
+            padding: 20px 30px;
+            box-shadow: var(--shadow-subtle);
+            border: 1px solid var(--border-color);
+            border-right: 6px solid var(--accent-blue);
+            text-align: center;
         }
 
-        .screen-wrapper video {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            display: block;
+        .intro-banner p {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #334155;
+            line-height: 1.8;
+            max-width: 1100px;
+            margin: 0 auto;
         }
 
-        /* شبكة الأطلس والحاويات مع زِر التكبير */
-        .atlas-main-grid {
-            width: 100%;
-            height: 100%;
-            overflow-y: auto;
-            padding: 15px;
+        /* شبكة الكروت التفاعلية الخمسة (Flashcards Grid) */
+        .cards-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            background-color: #0f172a;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 18px;
+            margin-top: 10px;
         }
 
-        .atlas-card {
+        .flash-card {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 20px 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            text-align: center;
+            text-decoration: none;
+            color: var(--text-main);
+            box-shadow: var(--shadow-subtle);
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
-            background-color: #ffffff;
-            border-radius: 8px;
             overflow: hidden;
-            border: 1px solid #334155;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            height: 380px;
-        }
-
-        .atlas-card img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            display: block;
-        }
-
-        /* زر تكبير الصورة فوق الكارت */
-        .zoom-overlay-btn {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: rgba(37, 99, 235, 0.9);
-            color: #ffffff;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: bold;
             cursor: pointer;
+            min-height: 240px;
+        }
+
+        .flash-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: var(--accent-blue);
+            box-shadow: 0 16px 30px -10px rgba(30, 64, 175, 0.25);
+        }
+
+        .card-img-wrapper {
+            width: 100%;
+            height: 120px;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            background: #f1f5f9;
+            margin-bottom: 14px;
             display: flex;
             align-items: center;
-            gap: 6px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-            transition: all 0.2s ease;
-            z-index: 10;
-        }
-
-        .zoom-overlay-btn:hover {
-            background: #1d4ed8;
-            transform: scale(1.05);
-        }
-
-        /* نافذة التكبير بملء الشاشة (Fullscreen Lightbox) */
-        .fullscreen-modal {
-            display: none;
-            position: fixed;
-            z-index: 999999;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.92);
-            backdrop-filter: blur(5px);
-            align-items: center;
             justify-content: center;
-            padding: 20px;
+            border: 1px solid #e2e8f0;
         }
 
-        .fullscreen-modal img {
-            max-width: 95vw;
-            max-height: 90vh;
-            object-fit: contain;
-            border-radius: 8px;
-            box-shadow: 0 0 25px rgba(255, 255, 255, 0.1);
+        .card-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
         }
 
-        .close-fullscreen {
-            position: absolute;
-            top: 20px;
-            left: 30px;
-            color: #ffffff;
-            font-size: 35px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: color 0.2s;
+        .flash-card:hover .card-img-wrapper img {
+            transform: scale(1.1);
         }
 
-        .close-fullscreen:hover {
-            color: #ef4444;
+        .card-icon-fallback {
+            font-size: 2.5rem;
+            color: var(--accent-blue);
         }
 
-        .player-details {
-            padding: 12px 20px;
-            background: #ffffff;
-            border-top: 1px solid var(--border-color);
-            flex-shrink: 0;
-        }
-
-        .player-details h2 {
-            font-size: 1.1rem;
+        .card-title {
+            font-size: 0.95rem;
             font-weight: 800;
             color: var(--primary);
+            line-height: 1.4;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        @media (max-width: 992px) {
-            html, body {
-                height: auto;
-                overflow: auto;
-            }
+        .flash-card:hover .card-title {
+            color: var(--accent-blue);
+        }
 
-            .main-container {
-                height: auto;
+        /* التكيف مع الشاشات المختلفة */
+        @media (max-width: 1200px) {
+            .cards-grid {
+                grid-template-columns: repeat(3, 1fr);
             }
+        }
 
-            .showcase-layout {
-                grid-template-columns: 1fr;
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 12px;
             }
+            .cards-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
 
-            .atlas-main-grid {
+        @media (max-width: 480px) {
+            .cards-grid {
                 grid-template-columns: 1fr;
             }
         }
@@ -377,13 +232,18 @@
 </head>
 <body>
 
+    <!-- الهيدر العلوي وفق تخطيط المسودة -->
     <header>
         <div class="logo-box">
-            <img src="Image/logo.png" alt="شعار جامعة قنا" onerror="this.src='image/logo.png';">
+            <img src="Image/logo.png" alt="شعار جامعة قنا" onerror="this.src='Image/logo.png';">
         </div>
 
-        <div class="header-title">
-            <h1>الخريطة التفاعلية لإنجازات جامعة قنا 2023 - 2026</h1>
+        <div class="header-center">
+            <img src="Image/project-logo.png" alt="شعار المشروع" class="project-badge" onerror="this.style.display='none';">
+            <div class="header-title">
+                <h1>الخريطة التفاعلية لإنجازات جامعة قنا</h1>
+                <div class="subtitle">( 2023 - 2026 )</div>
+            </div>
         </div>
 
         <div class="logo-box">
@@ -393,185 +253,62 @@
 
     <div class="main-container">
         
+        <!-- صندوق الوصف والترحيب الرئيسي -->
         <div class="intro-banner">
-            <div style="display: flex; align-items: center; gap: 15px; flex-grow: 1;">
-                <img src="Image/project-logo.png" alt="شعار المشروع" style="height: 80px; width: auto; object-fit: contain; flex-shrink: 0;" onerror="this.style.display='none';">
-                <p>أهلاً بكم في المنصة التفاعلية لإنجازات جامعة قنا خلال الفترة من 2023 إلى 2026، والتي تسلط الضوء على أبرز المشاريع والتطويرات العمرانية والتكنولوجية والتعليمية التي شهدتها الجامعة.</p>
-            </div>
+            <p>أهلاً بكم في المنصة التفاعلية لإنجازات جامعة قنا وممارساتها المثلى خلال الفترة من ( 2023 - 2026 ) والتي تسلط الضوء على أبرز المشروعات التطويرية والتطبيقات الإلكترونية والادلة التنظيمية والادلة التوضيحية التي أعدتها الجامعة.</p>
+        </div>
+
+        <!-- شبكة الفلاش كارد الخمسة مع تأثير الزوم/الحركة عند التمرير -->
+        <div class="cards-grid">
             
-            <a href="Map.html" class="map-action-btn">
-                <i class="fa-solid fa-map-location-dot"></i>
-                الخريطة التفاعلية
+            <!-- 1. الخريطة التفاعلية -->
+            <a href="Map.html" class="flash-card">
+                <div class="card-img-wrapper">
+                    <img src="Image/map_card.png" alt="الخريطة التفاعلية" onerror="this.remove(); document.getElementById('ic1').style.display='block';">
+                    <i id="ic1" class="fa-solid fa-map-location-dot card-icon-fallback" style="display:none;"></i>
+                </div>
+                <div class="card-title">الخريطة التفاعلية لإنجازات الجامعة</div>
             </a>
-        </div>
 
-        <div class="showcase-layout">
-            
-            <div class="playlist-panel">
-                <h3><i class="fa-solid fa-layer-group"></i> العروض التوثيقية</h3>
-                
-                <div class="playlist-items">
-                    
-                    <div class="playlist-item active" onclick="switchVideo(this, 'https://artsvuedu-my.sharepoint.com/:v:/g/personal/waleedadel_art_svu_edu_eg/IQDCu2FmPcUMTqLwNTOOmsz_AYKSd4dTsmTU17jWid7uALI?download=1', 'فيديو موقع جامعة قنا 2026')">
-                        <div class="thumb-icon"><i class="fa-solid fa-play"></i></div>
-                        <div class="item-info">
-                            <h4>فيديو موقع جامعة قنا 2026</h4>
-                        </div>
-                    </div>
-
-                    <div class="playlist-item" onclick="switchVideo(this, 'video/video2.mp4', 'تطوير البنية التحتية')">
-                        <div class="thumb-icon"><i class="fa-solid fa-play"></i></div>
-                        <div class="item-info">
-                            <h4>تطوير البنية التحتية</h4>
-                        </div>
-                    </div>
-
-                    <div class="playlist-item" onclick="switchVideo(this, 'video/video3.mp4', 'المشاريع الهندسية والإنشاءات')">
-                        <div class="thumb-icon"><i class="fa-solid fa-play"></i></div>
-                        <div class="item-info">
-                            <h4>المشاريع الهندسية والإنشاءات</h4>
-                        </div>
-                    </div>
-
-                    <div class="playlist-item" onclick="switchVideo(this, 'video/video4.mp4', 'التحول الرقمي والخدمات')">
-                        <div class="thumb-icon"><i class="fa-solid fa-play"></i></div>
-                        <div class="item-info">
-                            <h4>التحول الرقمي والخدمات</h4>
-                        </div>
-                    </div>
-
-                    <div class="playlist-item" onclick="switchVideo(this, 'video/video5.mp4', 'البيئة التعليمية والمرافق')">
-                        <div class="thumb-icon"><i class="fa-solid fa-play"></i></div>
-                        <div class="item-info">
-                            <h4>البيئة التعليمية والمرافق</h4>
-                        </div>
-                    </div>
-
-                    <div class="playlist-item atlas-item" onclick="showAtlasImages(this)">
-                        <div class="thumb-icon"><i class="fa-solid fa-book-atlas"></i></div>
-                        <div class="item-info">
-                            <h4>الأطلس الرقمي</h4>
-                        </div>
-                    </div>
-
+            <!-- 2. الأطلس الرقمي -->
+            <a href="Atlas.html" class="flash-card">
+                <div class="card-img-wrapper">
+                    <img src="Image/atlas_card.png" alt="الأطلس الرقمي" onerror="this.remove(); document.getElementById('ic2').style.display='block';">
+                    <i id="ic2" class="fa-solid fa-book-atlas card-icon-fallback" style="display:none;"></i>
                 </div>
-            </div>
+                <div class="card-title">الأطلس الرقمي لإنجازات الجامعة</div>
+            </a>
 
-            <div class="player-card">
-                <div class="screen-wrapper" id="screenWrapper">
-                    <video id="activeVideoPlayer" controls autoplay muted playsinline preload="metadata">
-                        <source id="videoSource" src="https://artsvuedu-my.sharepoint.com/:v:/g/personal/waleedadel_art_svu_edu_eg/IQDCu2FmPcUMTqLwNTOOmsz_AYKSd4dTsmTU17jWid7uALI?download=1" type="video/mp4">
-                        متصفحك لا يدعم تشغيل الفيديو.
-                    </video>
+            <!-- 3. الأفلام التوثيقية -->
+            <a href="Videos.html" class="flash-card">
+                <div class="card-img-wrapper">
+                    <img src="Image/video_card.png" alt="الأفلام التوثيقية" onerror="this.remove(); document.getElementById('ic3').style.display='block';">
+                    <i id="ic3" class="fa-solid fa-film card-icon-fallback" style="display:none;"></i>
                 </div>
-                <div class="player-details">
-                    <h2 id="activeVideoTitle">فيديو موقع جامعة قنا 2026</h2>
+                <div class="card-title">الأفلام التوثيقية لإنجازات الجامعة</div>
+            </a>
+
+            <!-- 4. أدلة ومطويات إنجازات الجامعة -->
+            <a href="Guides.html" class="flash-card">
+                <div class="card-img-wrapper">
+                    <img src="Image/guides_card.png" alt="أدلة ومطويات" onerror="this.remove(); document.getElementById('ic4').style.display='block';">
+                    <i id="ic4" class="fa-solid fa-file-pdf card-icon-fallback" style="display:none;"></i>
                 </div>
-            </div>
+                <div class="card-title">أدلة ومطويات إنجازات الجامعة</div>
+            </a>
+
+            <!-- 5. تطبيق مسيرة الإلكتروني -->
+            <a href="https://masira-app-link.edu.eg" target="_blank" class="flash-card">
+                <div class="card-img-wrapper">
+                    <img src="Image/masira_card.png" alt="تطبيق مسيرة" onerror="this.remove(); document.getElementById('ic5').style.display='block';">
+                    <i id="ic5" class="fa-solid fa-mobile-screen-button card-icon-fallback" style="display:none;"></i>
+                </div>
+                <div class="card-title">تطبيق مسيرة الإلكتروني لتوثيق إنجازات الجامعة</div>
+            </a>
 
         </div>
 
     </div>
 
-    <!-- نافذة العرض بملء الشاشة -->
-    <div id="fullscreenModal" class="fullscreen-modal" onclick="closeFullscreen()">
-        <span class="close-fullscreen">&times;</span>
-        <img id="fullscreenImg" src="" alt="صورة مكبرة">
-    </div>
-
-    <script>
-        function switchVideo(element, src, title) {
-            const wrapper = document.getElementById('screenWrapper');
-            const titleEl = document.getElementById('activeVideoTitle');
-
-            wrapper.innerHTML = `
-                <video id="activeVideoPlayer" controls autoplay playsinline preload="metadata">
-                    <source src="${src}" type="video/mp4">
-                    متصفحك لا يدعم تشغيل الفيديو.
-                </video>
-            `;
-            titleEl.innerText = title;
-
-            document.querySelectorAll('.playlist-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            element.classList.add('active');
-        }
-
-        // عرض الأطلس وبداخل كل صورة زر تكبير
-function showAtlasImages(element) {
-    const wrapper = document.getElementById('screenWrapper');
-    const titleEl = document.getElementById('activeVideoTitle');
-
-    wrapper.innerHTML = `
-        <div class="atlas-main-grid">
-            <div class="atlas-card">
-                <button class="zoom-overlay-btn" onclick="openFullscreen('atlas/الأدلة التنظيمية.jpg')"><i class="fa-solid fa-expand"></i> تكبير</button>
-                <img src="atlas/الأدلة التنظيمية.jpg" alt="الأدلة التنظيمية">
-            </div>
-            <div class="atlas-card">
-                <button class="zoom-overlay-btn" onclick="openFullscreen('atlas/الإنشاءات والصيانة.jpg')"><i class="fa-solid fa-expand"></i> تكبير</button>
-                <img src="atlas/الإنشاءات والصيانة.jpg" alt="الإنشاءات والصيانة">
-            </div>
-            <div class="atlas-card">
-                <button class="zoom-overlay-btn" onclick="openFullscreen('atlas/البنية التحتية.jpg')"><i class="fa-solid fa-expand"></i> تكبير</button>
-                <img src="atlas/البنية التحتية.jpg" alt="البنية التحتية">
-            </div>
-            <div class="atlas-card">
-                <button class="zoom-overlay-btn" onclick="openFullscreen('atlas/البيئة التعليمية.jpg')"><i class="fa-solid fa-expand"></i> تكبير</button>
-                <img src="atlas/البيئة التعليمية.jpg" alt="البيئة التعليمية">
-            </div>
-            <div class="atlas-card">
-                <button class="zoom-overlay-btn" onclick="openFullscreen('atlas/التحول الرقمي.jpg')"><i class="fa-solid fa-expand"></i> تكبير</button>
-                <img src="atlas/التحول الرقمي.jpg" alt="التحول الرقمي">
-            </div>
-            <div class="atlas-card">
-                <button class="zoom-overlay-btn" onclick="openFullscreen('atlas/الخدمات اللوجستية.jpg')"><i class="fa-solid fa-expand"></i> تكبير</button>
-                <img src="atlas/الخدمات اللوجستية.jpg" alt="الخدمات اللوجستية">
-            </div>
-            <div class="atlas-card">
-                <button class="zoom-overlay-btn" onclick="openFullscreen('atlas/الطرق والبوابات.jpg')"><i class="fa-solid fa-expand"></i> تكبير</button>
-                <img src="atlas/الطرق والبوابات.jpg" alt="الطرق والبوابات">
-            </div>
-            <div class="atlas-card">
-                <button class="zoom-overlay-btn" onclick="openFullscreen('atlas/الموقع العام .jpg')"><i class="fa-solid fa-expand"></i> تكبير</button>
-                <img src="atlas/الموقع العام .jpg" alt="الموقع العام">
-            </div>
-            <div class="atlas-card">
-                <button class="zoom-overlay-btn" onclick="openFullscreen('atlas/مباني ومرافق الجامعة.jpg')"><i class="fa-solid fa-expand"></i> تكبير</button>
-                <img src="atlas/مباني ومرافق الجامعة.jpg" alt="مباني ومرافق الجامعة">
-            </div>
-            <div class="atlas-card">
-                <button class="zoom-overlay-btn" onclick="openFullscreen('atlas/مظلة سيارات.jpg')"><i class="fa-solid fa-expand"></i> تكبير</button>
-                <img src="atlas/مظلة سيارات.jpg" alt="مظلة سيارات">
-            </div>
-            <div class="atlas-card">
-                <button class="zoom-overlay-btn" onclick="openFullscreen('atlas/مظلة طلاب.jpg')"><i class="fa-solid fa-expand"></i> تكبير</button>
-                <img src="atlas/مظلة طلاب.jpg" alt="مظلة طلاب">
-            </div>
-        </div>
-    `;
-    
-    titleEl.innerText = "الأطلس الرقمي";
-
-    document.querySelectorAll('.playlist-item').forEach(item => {
-        item.classList.remove('active');
-    });
-    element.classList.add('active');
-}
-
-        // دالة فتح الصورة بملء الشاشة
-        function openFullscreen(src) {
-            const modal = document.getElementById('fullscreenModal');
-            const img = document.getElementById('fullscreenImg');
-            img.src = src;
-            modal.style.display = 'flex';
-        }
-
-        // دالة إغلاق ملء الشاشة
-        function closeFullscreen() {
-            document.getElementById('fullscreenModal').style.display = 'none';
-        }
-    </script>
 </body>
 </html>
