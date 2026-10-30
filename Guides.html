@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         :root {
             --bg-body: #f8fafc;
@@ -84,7 +85,7 @@
         .list-item {
             display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: var(--radius-md);
             border: 1px solid #e2e8f0; background: #f8fafc; cursor: pointer; transition: all 0.2s ease;
-            font-size: 0.88rem; font-weight: 700; line-height: 1.4;
+            font-size: 0.88rem; font-weight: 700; line-height: 1.4; position: relative;
         }
 
         .list-item:hover, .list-item.active { background: #eff6ff; border-color: #bfdbfe; }
@@ -96,31 +97,37 @@
         }
         .list-item.active .item-icon { background: var(--accent-blue); color: #ffffff; }
 
-        /* منطقة عرض الكتاب الرقمي */
+        .badge-soon {
+            font-size: 0.68rem; background: #f59e0b; color: #ffffff; padding: 2px 8px;
+            border-radius: 12px; margin-right: auto; white-space: nowrap; font-weight: 800;
+        }
+
+        /* منطقة العرض الرئيسية */
         .main-display {
-            flex: 1; background: #1e293b; border-radius: var(--radius-lg); border: 1px solid var(--border-color);
+            flex: 1; background: #0f172a; border-radius: var(--radius-lg); border: 1px solid var(--border-color);
             position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;
             overflow: hidden; height: 100%; min-width: 0;
         }
 
-        /* منع التنزيل والنسخ حمايةً للملفات */
-        .pdf-viewer-container {
-            width: 100%; height: 100%; border: none; user-select: none; -webkit-user-select: none;
+        .pdf-viewer-object {
+            width: 100%;
+            height: 100%;
+            border: none;
         }
 
-        /* شريط التحكم للتصفح */
-        .pdf-controls {
-            position: absolute; bottom: 15px; background: rgba(15, 23, 42, 0.9); color: #fff;
-            padding: 8px 18px; border-radius: 30px; display: flex; align-items: center; gap: 15px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.4); z-index: 10; backdrop-filter: blur(5px);
+        .coming-soon-box {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 16px; color: #ffffff; text-align: center; padding: 30px;
         }
+        .coming-soon-box i { font-size: 4rem; color: #f59e0b; animation: pulse 2s infinite; }
+        .coming-soon-box h2 { font-size: 2rem; font-weight: 900; letter-spacing: 1px; color: #f8fafc; }
+        .coming-soon-box p { font-size: 1.1rem; color: #94a3b8; font-weight: 600; }
 
-        .pdf-controls button {
-            background: #2563eb; color: #fff; border: none; padding: 6px 14px; border-radius: 20px;
-            font-size: 0.85rem; font-weight: bold; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 5px;
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.08); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
         }
-        .pdf-controls button:hover { background: #1d4ed8; }
-        .pdf-controls button:disabled { background: #475569; cursor: not-allowed; }
 
         @media (max-width: 992px) {
             header { padding: 6px 12px; gap: 8px; }
@@ -175,44 +182,67 @@
             </div>
 
             <div class="item-list">
-                <div class="list-item active" onclick="loadPDF('docs/best_practices_v1.pdf', this)">
+                <div class="list-item active" onclick="loadPDFDoc('docs/دليل الممارسات الفضلي لجامعة قنا فبراير ٢٠٢٦.pdf', this, true)">
                     <div class="item-icon"><i class="fa-solid fa-book-open"></i></div>
                     <div>دليل الممارسات الفضلى في مجالات العمل الرئيسية بجامعة قنا (الإصدار الأول - فبراير ٢٠٢٦م)</div>
                 </div>
 
-                <div class="list-item" onclick="loadPDF('docs/best_practices_v2.pdf', this)">
+                <div class="list-item" onclick="loadPDFDoc('', this, false)">
                     <div class="item-icon"><i class="fa-solid fa-book-bookmark"></i></div>
                     <div>دليل الممارسات الفضلى في مجالات العمل الرئيسية بجامعة قنا (الإصدار الثاني - ديسمبر ٢٠٢٦م)</div>
+                    <span class="badge-soon">Coming Soon</span>
                 </div>
 
-                <div class="list-item" onclick="loadPDF('docs/illustrated_guide_2025.pdf', this)">
+                <div class="list-item" onclick="loadPDFDoc('', this, false)">
                     <div class="item-icon"><i class="fa-solid fa-images"></i></div>
                     <div>الدليل المصور لجامعة قنا (الإصدار الأول- ٢٠٢٥م)</div>
+                    <span class="badge-soon">Coming Soon</span>
                 </div>
             </div>
         </div>
 
-        <!-- منطقة العرض مع قارئ التصفح بدون زر تنزيل -->
-        <div class="main-display">
-            <iframe id="pdfViewer" class="pdf-viewer-container" src="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://raw.githubusercontent.com/mozilla/pdfjs-dist/master/web/compressed.tracemonkey.pdf#toolbar=0&navpanes=0"></iframe>
+        <!-- منطقة العرض الرئيسية -->
+        <div class="main-display" id="mainDisplay">
+            <!-- تحميل الكتاب مباشرة هنا -->
         </div>
     </div>
 
     <script>
-        function loadPDF(pdfPath, element) {
-            // استخدام موجه PDF.js المعطل فيه التنزيل والطباعة `#toolbar=0`
-            const pdfViewerApp = `https://mozilla.github.io/pdf.js/web/viewer.html?file=${encodeURIComponent(pdfPath)}#toolbar=0&navpanes=0&scrollbar=0`;
-            
-            document.getElementById('pdfViewer').src = pdfViewerApp;
+        function loadPDFDoc(pdfPath, element, isAvailable) {
+            const display = document.getElementById('mainDisplay');
 
-            // تحديث التحديد
             document.querySelectorAll('.list-item').forEach(el => el.classList.remove('active'));
-            if(element) element.classList.add('active');
+            if (element) element.classList.add('active');
 
-            if (window.innerWidth <= 992) {
-                closeSidebar();
+            if (!isAvailable || !pdfPath) {
+                display.innerHTML = `
+                    <div class="coming-soon-box">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                        <h2>COMING SOON</h2>
+                        <p>جاري إعداد وتوثيق هذا الدليل وسيتم إتاحته قريباً عبر المنصة</p>
+                    </div>
+                `;
+                return;
             }
+
+            // إعداد معلمات العرض:
+            // view=FitH (تكبير وتوافق أفقي)
+            // page-mode=thumbs (وضع العرض)
+            // toolbar=0 (إخفاء شريط الأدوات)
+            const params = '#toolbar=0&navpanes=0&view=FitH';
+            const fullPath = encodeURI(pdfPath) + params;
+
+            display.innerHTML = `<object class="pdf-viewer-object" data="${fullPath}" type="application/pdf">
+                <iframe class="pdf-viewer-object" src="${fullPath}"></iframe>
+            </object>`;
+
+            if (window.innerWidth <= 992) closeSidebar();
         }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const activeItem = document.querySelector('.list-item.active');
+            loadPDFDoc('docs/دليل الممارسات الفضلي لجامعة قنا فبراير ٢٠٢٦.pdf', activeItem, true);
+        });
 
         function toggleSidebar() {
             const container = document.getElementById('layoutContainer');
@@ -232,8 +262,13 @@
             document.getElementById('sidebarOverlay').classList.remove('active');
         }
 
-        // حماية مضافة لمنع النقر الأيمن داخل الصفحة
+        // إغلاق خيارات القائمة اليمنى لمنع الطباعة أو التنزيل
         document.addEventListener('contextmenu', event => event.preventDefault());
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 's' || e.key === 'u')) {
+                e.preventDefault();
+            }
+        });
     </script>
 </body>
 </html>
