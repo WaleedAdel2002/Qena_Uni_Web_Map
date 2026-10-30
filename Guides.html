@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أدلة ومطويات إنجازات جامعة قنا</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-body: #f8fafc;
+            --card-bg: #ffffff;
+            --primary: #0f172a;
+            --accent-blue: #1e40af;
+            --border-color: #cbd5e1;
+            --radius-lg: 14px;
+            --radius-md: 10px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
+        body { background-color: var(--bg-body); color: #1e293b; min-height: 100vh; display: flex; flex-direction: column; }
+
+        header {
+            background: #ffffff;
+            border-bottom: 2px solid var(--border-color);
+            padding: 10px 4%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 70px;
+        }
+        .logo-box { width: 90px; height: 50px; }
+        .logo-box img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .header-title h1 { font-size: 1.2rem; font-weight: 800; color: var(--primary); text-align: center; }
+        
+        .nav-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #e2e8f0;
+            color: var(--primary);
+            padding: 6px 16px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 700;
+            transition: all 0.2s;
+        }
+        .nav-back:hover { background: #cbd5e1; }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+            width: 100%;
+            flex: 1;
+        }
+
+        .tabs-header {
+            display: flex;
+            gap: 12px;
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            padding: 10px 24px;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #64748b;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            color: var(--accent-blue);
+            border-bottom-color: var(--accent-blue);
+        }
+
+        .guides-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .guide-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            transition: transform 0.2s;
+        }
+
+        .guide-card:hover { transform: translateY(-4px); }
+
+        .guide-icon {
+            font-size: 3rem;
+            color: #dc2626;
+            margin-bottom: 12px;
+        }
+
+        .guide-card h3 {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 16px;
+        }
+
+        .download-btn {
+            margin-top: auto;
+            background: var(--accent-blue);
+            color: #fff;
+            padding: 8px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .download-btn:hover { background: #1d4ed8; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <a href="index.html" class="nav-back"><i class="fa-solid fa-arrow-right"></i> الرئيسية</a>
+            <div class="logo-box">
+                <img src="Image/logo.png" alt="شعار الجامعة" onerror="this.src='Image/logo.png';">
+            </div>
+        </div>
+        <div class="header-title">
+            <h1>أدلة ومطويات إنجازات جامعة قنا ( 2023 - 2026 )</h1>
+        </div>
+        <div class="logo-box">
+            <img src="Image/مسيرة.png" alt="شعار مسيرة" onerror="this.src='Image/مسيرة.jpg';">
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="tabs-header">
+            <button class="tab-btn active" onclick="switchTab('all')">كل الأدلة والمطويات</button>
+            <button class="tab-btn" onclick="switchTab('guides')">الأدلة التنظيمية</button>
+            <button class="tab-btn" onclick="switchTab('brochures')">المطويات التوضيحية</button>
+        </div>
+
+        <div class="guides-grid">
+            <div class="guide-card" data-category="guides">
+                <i class="fa-solid fa-file-pdf guide-icon"></i>
+                <h3>الدليل التنظيمي لحوكمة المشاريع 2026</h3>
+                <a href="pdf/guide1.pdf" class="download-btn" target="_blank"><i class="fa-solid fa-download"></i> استعراض / تحميل</a>
+            </div>
+
+            <div class="guide-card" data-category="guides">
+                <i class="fa-solid fa-file-pdf guide-icon"></i>
+                <h3>دليل ممارسات الحوكمة والتحول الرقمي</h3>
+                <a href="pdf/guide2.pdf" class="download-btn" target="_blank"><i class="fa-solid fa-download"></i> استعراض / تحميل</a>
+            </div>
+
+            <div class="guide-card" data-category="brochures">
+                <i class="fa-solid fa-file-pdf guide-icon"></i>
+                <h3>مطوية إنجازات الجامعة التنموية</h3>
+                <a href="pdf/brochure1.pdf" class="download-btn" target="_blank"><i class="fa-solid fa-download"></i> استعراض / تحميل</a>
+            </div>
+
+            <div class="guide-card" data-category="brochures">
+                <i class="fa-solid fa-file-pdf guide-icon"></i>
+                <h3>مطوية مشروع الخريطة والتطبيق الرقمي</h3>
+                <a href="pdf/brochure2.pdf" class="download-btn" target="_blank"><i class="fa-solid fa-download"></i> استعراض / تحميل</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(cat) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+
+            document.querySelectorAll('.guide-card').forEach(card => {
+                if(cat === 'all' || card.dataset.category === cat) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
