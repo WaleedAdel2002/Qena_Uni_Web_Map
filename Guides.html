@@ -20,183 +20,220 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
-        body { background-color: var(--bg-body); color: #1e293b; min-height: 100vh; display: flex; flex-direction: column; }
+        body { background-color: var(--bg-body); color: #1e293b; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
+        /* الهيدر العلوي */
         header {
             background: #ffffff;
             border-bottom: 2px solid var(--border-color);
-            padding: 10px 4%;
+            padding: 8px 24px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            height: 70px;
+            min-height: 65px;
+            gap: 15px;
+            flex-shrink: 0;
+            z-index: 10;
         }
-        .logo-box { width: 90px; height: 50px; }
+        
+        .header-right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+        .logo-box { width: 70px; height: 45px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .logo-box img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        .header-title h1 { font-size: 1.2rem; font-weight: 800; color: var(--primary); text-align: center; }
+        
+        .header-title { flex: 1; text-align: center; }
+        .header-title h1 { font-size: 1.25rem; font-weight: 800; color: var(--primary); line-height: 1.2; }
+        .header-title .sub-date { display: block; font-size: 0.85rem; color: #2563eb; font-weight: 700; margin-top: 2px; }
         
         .nav-back {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: #e2e8f0;
-            color: var(--primary);
-            padding: 6px 16px;
-            border-radius: 20px;
-            text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 700;
-            transition: all 0.2s;
+            display: inline-flex; align-items: center; gap: 6px; background: #e2e8f0; color: var(--primary);
+            padding: 7px 16px; border-radius: 20px; text-decoration: none; font-size: 0.88rem; font-weight: 700;
+            white-space: nowrap; transition: all 0.2s; flex-shrink: 0;
         }
         .nav-back:hover { background: #cbd5e1; }
 
-        .container {
-            max-width: 1200px;
-            margin: 20px auto;
-            padding: 0 20px;
-            width: 100%;
-            flex: 1;
+        .toggle-sidebar-btn {
+            display: inline-flex; align-items: center; gap: 8px; background: var(--accent-blue); color: #ffffff;
+            border: none; padding: 8px 16px; border-radius: 8px; font-size: 0.9rem; font-weight: 800;
+            cursor: pointer; box-shadow: 0 3px 8px rgba(30, 64, 175, 0.25); white-space: nowrap; flex-shrink: 0;
+            transition: all 0.2s ease;
+        }
+        .toggle-sidebar-btn:hover { background: #1d4ed8; }
+
+        /* التخطيط الرئيسي */
+        .layout-container { display: flex; gap: 16px; padding: 16px 24px; flex: 1; min-height: 0; position: relative; overflow: hidden; }
+
+        .sidebar {
+            width: 360px; background: var(--card-bg); border-radius: var(--radius-lg); border: 1px solid var(--border-color);
+            padding: 16px; display: flex; flex-direction: column; gap: 12px; height: 100%; min-height: 0; flex-shrink: 0;
+            transition: margin-right 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease; position: relative; z-index: 5;
         }
 
-        .tabs-header {
-            display: flex;
-            gap: 12px;
-            border-bottom: 2px solid #e2e8f0;
-            margin-bottom: 20px;
+        .layout-container.sidebar-closed .sidebar { margin-right: -376px; opacity: 0; pointer-events: none; }
+
+        .sidebar-header { display: flex; align-items: center; justify-content: space-between; padding-bottom: 10px; border-bottom: 2px solid #f1f5f9; }
+        .sidebar-header h3 { font-size: 1.02rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 8px; }
+
+        .close-sidebar-btn {
+            background: #f1f5f9; color: #64748b; border: none; width: 30px; height: 30px; border-radius: 50%;
+            font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+        }
+        .close-sidebar-btn:hover { background: #ef4444; color: #fff; }
+
+        .item-list { display: flex; flex-direction: column; gap: 8px; overflow-y: auto; flex: 1; }
+
+        .list-item {
+            display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: var(--radius-md);
+            border: 1px solid #e2e8f0; background: #f8fafc; cursor: pointer; transition: all 0.2s ease;
+            font-size: 0.88rem; font-weight: 700; line-height: 1.4;
         }
 
-        .tab-btn {
-            padding: 10px 24px;
-            font-size: 1rem;
-            font-weight: 700;
-            color: #64748b;
-            background: none;
-            border: none;
-            border-bottom: 3px solid transparent;
-            cursor: pointer;
-            transition: all 0.2s;
+        .list-item:hover, .list-item.active { background: #eff6ff; border-color: #bfdbfe; }
+        .list-item.active { border-right: 4px solid var(--accent-blue); color: var(--accent-blue); }
+
+        .item-icon {
+            width: 34px; height: 34px; background: #dbeafe; color: var(--accent-blue); border-radius: 8px;
+            display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0;
+        }
+        .list-item.active .item-icon { background: var(--accent-blue); color: #ffffff; }
+
+        /* منطقة عرض الكتاب الرقمي */
+        .main-display {
+            flex: 1; background: #1e293b; border-radius: var(--radius-lg); border: 1px solid var(--border-color);
+            position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            overflow: hidden; height: 100%; min-width: 0;
         }
 
-        .tab-btn.active {
-            color: var(--accent-blue);
-            border-bottom-color: var(--accent-blue);
+        /* منع التنزيل والنسخ حمايةً للملفات */
+        .pdf-viewer-container {
+            width: 100%; height: 100%; border: none; user-select: none; -webkit-user-select: none;
         }
 
-        .guides-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
+        /* شريط التحكم للتصفح */
+        .pdf-controls {
+            position: absolute; bottom: 15px; background: rgba(15, 23, 42, 0.9); color: #fff;
+            padding: 8px 18px; border-radius: 30px; display: flex; align-items: center; gap: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4); z-index: 10; backdrop-filter: blur(5px);
         }
 
-        .guide-card {
-            background: var(--card-bg);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border-color);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-            transition: transform 0.2s;
+        .pdf-controls button {
+            background: #2563eb; color: #fff; border: none; padding: 6px 14px; border-radius: 20px;
+            font-size: 0.85rem; font-weight: bold; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 5px;
         }
+        .pdf-controls button:hover { background: #1d4ed8; }
+        .pdf-controls button:disabled { background: #475569; cursor: not-allowed; }
 
-        .guide-card:hover { transform: translateY(-4px); }
+        @media (max-width: 992px) {
+            header { padding: 6px 12px; gap: 8px; }
+            .logo-box { width: 45px; height: 32px; }
+            .header-title h1 { font-size: 0.85rem; }
+            .header-title .sub-date { font-size: 0.72rem; }
+            .nav-back, .toggle-sidebar-btn { padding: 5px 10px; font-size: 0.75rem; }
+            .layout-container { padding: 10px; }
 
-        .guide-icon {
-            font-size: 3rem;
-            color: #dc2626;
-            margin-bottom: 12px;
+            .sidebar {
+                position: fixed; top: 0; right: 0; width: 85%; max-width: 320px; height: 100vh;
+                z-index: 100; border-radius: 0; transform: translateX(100%); margin-right: 0 !important;
+                opacity: 1 !important; transition: transform 0.3s ease;
+            }
+            .sidebar.mobile-open { transform: translateX(0); }
+            .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(3px); z-index: 90; }
+            .sidebar-overlay.active { display: block; }
         }
-
-        .guide-card h3 {
-            font-size: 1rem;
-            font-weight: 800;
-            color: var(--primary);
-            margin-bottom: 16px;
-        }
-
-        .download-btn {
-            margin-top: auto;
-            background: var(--accent-blue);
-            color: #fff;
-            padding: 8px 20px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 0.9rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .download-btn:hover { background: #1d4ed8; }
     </style>
 </head>
 <body>
 
     <header>
-        <div style="display: flex; align-items: center; gap: 15px;">
+        <div class="header-right">
             <a href="index.html" class="nav-back"><i class="fa-solid fa-arrow-right"></i> الرئيسية</a>
+            <button class="toggle-sidebar-btn" id="toggleBtn" onclick="toggleSidebar()">
+                <i class="fa-solid fa-bars-staggered"></i> قائـمة الأدلة
+            </button>
             <div class="logo-box">
-                <img src="Image/logo.png" alt="شعار الجامعة" onerror="this.src='Image/logo.png';">
+                <img src="Image/logo.png" alt="شعار الجامعة">
             </div>
         </div>
+
         <div class="header-title">
-            <h1>أدلة ومطويات إنجازات جامعة قنا ( 2023 - 2026 )</h1>
+            <h1>أدلة ومطويات إنجازات جامعة قنا</h1>
+            <span class="sub-date">( 2023 - 2026 )</span>
         </div>
+
         <div class="logo-box">
-            <img src="Image/مسيرة.png" alt="شعار مسيرة" onerror="this.src='Image/مسيرة.jpg';">
+            <img src="Image/مسيرة.png" alt="شعار مسيرة">
         </div>
     </header>
 
-    <div class="container">
-        <div class="tabs-header">
-            <button class="tab-btn active" onclick="switchTab('all')">كل الأدلة والمطويات</button>
-            <button class="tab-btn" onclick="switchTab('guides')">الأدلة التنظيمية</button>
-            <button class="tab-btn" onclick="switchTab('brochures')">المطويات التوضيحية</button>
+    <div class="layout-container" id="layoutContainer">
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+        <!-- القائمة الجانبية -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h3><i class="fa-solid fa-file-pdf"></i> أدلة ومطويات الجامعة</h3>
+                <button class="close-sidebar-btn" onclick="toggleSidebar()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="item-list">
+                <div class="list-item active" onclick="loadPDF('docs/best_practices_v1.pdf', this)">
+                    <div class="item-icon"><i class="fa-solid fa-book-open"></i></div>
+                    <div>دليل الممارسات الفضلى في مجالات العمل الرئيسية بجامعة قنا (الإصدار الأول - فبراير ٢٠٢٦م)</div>
+                </div>
+
+                <div class="list-item" onclick="loadPDF('docs/best_practices_v2.pdf', this)">
+                    <div class="item-icon"><i class="fa-solid fa-book-bookmark"></i></div>
+                    <div>دليل الممارسات الفضلى في مجالات العمل الرئيسية بجامعة قنا (الإصدار الثاني - ديسمبر ٢٠٢٦م)</div>
+                </div>
+
+                <div class="list-item" onclick="loadPDF('docs/illustrated_guide_2025.pdf', this)">
+                    <div class="item-icon"><i class="fa-solid fa-images"></i></div>
+                    <div>الدليل المصور لجامعة قنا (الإصدار الأول- ٢٠٢٥م)</div>
+                </div>
+            </div>
         </div>
 
-        <div class="guides-grid">
-            <div class="guide-card" data-category="guides">
-                <i class="fa-solid fa-file-pdf guide-icon"></i>
-                <h3>الدليل التنظيمي لحوكمة المشاريع 2026</h3>
-                <a href="pdf/guide1.pdf" class="download-btn" target="_blank"><i class="fa-solid fa-download"></i> استعراض / تحميل</a>
-            </div>
-
-            <div class="guide-card" data-category="guides">
-                <i class="fa-solid fa-file-pdf guide-icon"></i>
-                <h3>دليل ممارسات الحوكمة والتحول الرقمي</h3>
-                <a href="pdf/guide2.pdf" class="download-btn" target="_blank"><i class="fa-solid fa-download"></i> استعراض / تحميل</a>
-            </div>
-
-            <div class="guide-card" data-category="brochures">
-                <i class="fa-solid fa-file-pdf guide-icon"></i>
-                <h3>مطوية إنجازات الجامعة التنموية</h3>
-                <a href="pdf/brochure1.pdf" class="download-btn" target="_blank"><i class="fa-solid fa-download"></i> استعراض / تحميل</a>
-            </div>
-
-            <div class="guide-card" data-category="brochures">
-                <i class="fa-solid fa-file-pdf guide-icon"></i>
-                <h3>مطوية مشروع الخريطة والتطبيق الرقمي</h3>
-                <a href="pdf/brochure2.pdf" class="download-btn" target="_blank"><i class="fa-solid fa-download"></i> استعراض / تحميل</a>
-            </div>
+        <!-- منطقة العرض مع قارئ التصفح بدون زر تنزيل -->
+        <div class="main-display">
+            <iframe id="pdfViewer" class="pdf-viewer-container" src="https://mozilla.github.io/pdf.js/web/viewer.html?file=https://raw.githubusercontent.com/mozilla/pdfjs-dist/master/web/compressed.tracemonkey.pdf#toolbar=0&navpanes=0"></iframe>
         </div>
     </div>
 
     <script>
-        function switchTab(cat) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            event.currentTarget.classList.add('active');
+        function loadPDF(pdfPath, element) {
+            // استخدام موجه PDF.js المعطل فيه التنزيل والطباعة `#toolbar=0`
+            const pdfViewerApp = `https://mozilla.github.io/pdf.js/web/viewer.html?file=${encodeURIComponent(pdfPath)}#toolbar=0&navpanes=0&scrollbar=0`;
+            
+            document.getElementById('pdfViewer').src = pdfViewerApp;
 
-            document.querySelectorAll('.guide-card').forEach(card => {
-                if(cat === 'all' || card.dataset.category === cat) {
-                    card.style.display = 'flex';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
+            // تحديث التحديد
+            document.querySelectorAll('.list-item').forEach(el => el.classList.remove('active'));
+            if(element) element.classList.add('active');
+
+            if (window.innerWidth <= 992) {
+                closeSidebar();
+            }
         }
+
+        function toggleSidebar() {
+            const container = document.getElementById('layoutContainer');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+
+            if (window.innerWidth <= 992) {
+                sidebar.classList.toggle('mobile-open');
+                overlay.classList.toggle('active');
+            } else {
+                container.classList.toggle('sidebar-closed');
+            }
+        }
+
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('mobile-open');
+            document.getElementById('sidebarOverlay').classList.remove('active');
+        }
+
+        // حماية مضافة لمنع النقر الأيمن داخل الصفحة
+        document.addEventListener('contextmenu', event => event.preventDefault());
     </script>
 </body>
 </html>
