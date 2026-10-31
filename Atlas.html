@@ -117,7 +117,7 @@
         .layout-container {
             display: flex;
             gap: 16px;
-            padding: 16px 24px;
+            padding: 5px 24px;
             flex: 1;
             min-height: 0;
             position: relative;
@@ -362,6 +362,53 @@
                 display: block;
             }
         }
+
+/* تنسيق مستطيل حقوق التوثيق في الأسفل */
+.footer-rights-box {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 5px 5px;
+    margin: 1px auto 15px auto;
+    width: calc(100% - 48px);
+    max-width: 1200px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.footer-line-1 {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: #1e40af;
+    margin-bottom: 6px;
+}
+
+.footer-line-2 {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #334155;
+    line-height: 1.6;
+}
+
+.footer-line-2 span {
+    font-weight: 800;
+    color: #0f172a;
+}
+
+/* التوافق مع شاشات الموبايل والأجهزة اللوحية */
+@media (max-width: 768px) {
+    .footer-rights-box {
+        width: calc(100% - 20px);
+        padding: 10px 12px;
+        margin-top: 15px;
+    }
+    .footer-line-1 {
+        font-size: 0.82rem;
+    }
+    .footer-line-2 {
+        font-size: 0.72rem;
+    }
+}
     </style>
 </head>
 <body>
@@ -427,7 +474,7 @@
                 </div>
                 <div class="list-item" onclick="loadMap('atlas/التحول الرقمي.jpg', 'مشروعات التحول الرقمي')">
                     <div class="item-icon"><i class="fa-solid fa-laptop-code"></i></div>
-                    <div>مشروعات مشروعات التحول الرقمي</div>
+                    <div>مشروعات التحول الرقمي</div>
                 </div>
                 <div class="list-item" onclick="loadMap('atlas/الطرق والبوابات.jpg', 'شبكة الطرق والبوابات')">
                     <div class="item-icon"><i class="fa-solid fa-road"></i></div>
@@ -465,6 +512,22 @@
         <span class="close-modal">&times;</span>
         <img id="modalImg" src="atlas/الموقع العام .jpg" alt="صورة مكبرة">
     </div>
+<!-- شريط التوثيق وحقوق الملكية -->
+<footer class="footer-rights-box">
+    <div class="footer-line-1">
+        جميع الحقوق محفوظة لمشروع توثيق مسيرة التطوير بجامعة قنا (مسيرة) -                  <span>    تحت إشراف   :           </span> أ.د. أحمد عكاوي - رئيس الجامعة والمشرف العام     
+
+    </div>
+    <div class="footer-line-2">
+        <span>مدير المشروع:</span> أ.م.د. طارق الكاشف - مدير مركز ضمان الجودة والتأهيل للاعتماد بالجامعة | 
+        أ. وليد عادل صلاح عبد الغفار - المعيد بقسم الجغرافيا ونظم المعلومات الجغرافية بكلية الآداب بالجامعة | 
+    </div>
+    </div>
+    <div class="footer-line-2">
+        د. محمد مهدي خليفة - مدير عام الإدارة العامة للشئون العامة | 
+        أ. سيد عبد الفتاح محمد محمد - الإدارة العامة للعلاقات العامة
+    </div>
+</footer>
 
     <script>
         let activeSrc = 'atlas/الموقع العام .jpg';

@@ -27,7 +27,7 @@
         header {
             background: #ffffff;
             border-bottom: 2px solid var(--border-color);
-            padding: 8px 24px;
+            padding: 1px 24px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -47,7 +47,7 @@
         
         .nav-back {
             display: inline-flex; align-items: center; gap: 6px; background: #e2e8f0; color: var(--primary);
-            padding: 7px 16px; border-radius: 20px; text-decoration: none; font-size: 0.88rem; font-weight: 700;
+            padding: 1px 16px; border-radius: 20px; text-decoration: none; font-size: 0.88rem; font-weight: 700;
             white-space: nowrap; transition: all 0.2s; flex-shrink: 0;
         }
         .nav-back:hover { background: #cbd5e1; }
@@ -61,7 +61,7 @@
         .toggle-sidebar-btn:hover { background: #1d4ed8; }
 
         /* التخطيط الرئيسي */
-        .layout-container { display: flex; gap: 16px; padding: 16px 24px; flex: 1; min-height: 0; position: relative; overflow: hidden; }
+        .layout-container { display: flex; gap: 16px; padding: 5px 24px; flex: 1; min-height: 0; position: relative; overflow: hidden; }
 
         .sidebar {
             width: 360px; background: var(--card-bg); border-radius: var(--radius-lg); border: 1px solid var(--border-color);
@@ -146,6 +146,61 @@
             .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(3px); z-index: 90; }
             .sidebar-overlay.active { display: block; }
         }
+
+
+
+/* تنسيق مستطيل حقوق التوثيق في الأسفل */
+.footer-rights-box {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 0px 20px;
+    margin: 10px auto 15px auto;
+    width: calc(100% - 48px);
+    max-width: 1200px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.footer-line-1 {
+    font-size: 0.92rem;
+    font-weight: 800;
+    color: #1e40af;
+    margin-bottom: 6px;
+}
+
+.footer-line-2 {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #334155;
+    line-height: 1.6;
+}
+
+.footer-line-2 span {
+    font-weight: 800;
+    color: #0f172a;
+}
+
+/* التوافق مع شاشات الموبايل والأجهزة اللوحية */
+@media (max-width: 768px) {
+    .footer-rights-box {
+        width: calc(100% - 20px);
+        padding: 10px 12px;
+        margin-top: 15px;
+    }
+    .footer-line-1 {
+        font-size: 0.82rem;
+    }
+    .footer-line-2 {
+        font-size: 0.72rem;
+    }
+}
+
+
+
+
+
+
     </style>
 </head>
 <body>
@@ -193,11 +248,18 @@
                     <span class="badge-soon">Coming Soon</span>
                 </div>
 
+                <div class="list-item active" onclick="loadPDFDoc('docs/الدليل المصور لجامعة قنا.pdf', this, true)">
+                    <div class="item-icon"><i class="fa-solid fa-book-open"></i></div>
+                    <div>الدليل المصور لجامعة قنا</div>
+                </div>
+
+
                 <div class="list-item" onclick="loadPDFDoc('', this, false)">
-                    <div class="item-icon"><i class="fa-solid fa-images"></i></div>
-                    <div>الدليل المصور لجامعة قنا (الإصدار الأول- ٢٠٢٥م)</div>
+                    <div class="item-icon"><i class="fa-solid fa-book-bookmark"></i></div>
+                    <div> أطلس مسيرة التطوير بجامعة قنا (٢٠٢٣- ٢٠٢٦م)- الإصدار الأول أكتوبر ٢٠٢٦م</div>
                     <span class="badge-soon">Coming Soon</span>
                 </div>
+
             </div>
         </div>
 
@@ -206,6 +268,28 @@
             <!-- تحميل الكتاب مباشرة هنا -->
         </div>
     </div>
+
+
+
+
+<!-- شريط التوثيق وحقوق الملكية -->
+<footer class="footer-rights-box">
+    <div class="footer-line-1">
+        جميع الحقوق محفوظة لمشروع توثيق مسيرة التطوير بجامعة قنا (مسيرة) -                  <span>    تحت إشراف   :           </span> أ.د. أحمد عكاوي - رئيس الجامعة والمشرف العام     
+
+    </div>
+    <div class="footer-line-2">
+        <span>مدير المشروع:</span> أ.م.د. طارق الكاشف - مدير مركز ضمان الجودة والتأهيل للاعتماد بالجامعة | 
+        أ. وليد عادل صلاح عبد الغفار - المعيد بقسم الجغرافيا ونظم المعلومات الجغرافية بكلية الآداب بالجامعة | 
+    </div>
+    </div>
+    <div class="footer-line-2">
+        د. محمد مهدي خليفة - مدير عام الإدارة العامة للشئون العامة | 
+        أ. سيد عبد الفتاح محمد محمد - الإدارة العامة للعلاقات العامة
+    </div>
+</footer>
+
+
 
     <script>
         function loadPDFDoc(pdfPath, element, isAvailable) {
