@@ -147,60 +147,47 @@
             .sidebar-overlay.active { display: block; }
         }
 
+        /* تنسيق مستطيل حقوق التوثيق في الأسفل */
+        .footer-rights-box {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 6px 20px;
+            margin: 10px auto 15px auto;
+            width: calc(100% - 48px);
+            max-width: 1200px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
 
+        .footer-line-1 {
+            font-size: 0.92rem;
+            font-weight: 800;
+            color: #1e40af;
+            margin-bottom: 6px;
+        }
 
-/* تنسيق مستطيل حقوق التوثيق في الأسفل */
-.footer-rights-box {
-    background: #ffffff;
-    border: 1px solid #cbd5e1;
-    border-radius: 12px;
-    padding: 0px 20px;
-    margin: 10px auto 15px auto;
-    width: calc(100% - 48px);
-    max-width: 1200px;
-    text-align: center;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-}
+        .footer-line-2 {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #334155;
+            line-height: 1.6;
+        }
 
-.footer-line-1 {
-    font-size: 0.92rem;
-    font-weight: 800;
-    color: #1e40af;
-    margin-bottom: 6px;
-}
+        .footer-line-2 span {
+            font-weight: 800;
+            color: #0f172a;
+        }
 
-.footer-line-2 {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: #334155;
-    line-height: 1.6;
-}
-
-.footer-line-2 span {
-    font-weight: 800;
-    color: #0f172a;
-}
-
-/* التوافق مع شاشات الموبايل والأجهزة اللوحية */
-@media (max-width: 768px) {
-    .footer-rights-box {
-        width: calc(100% - 20px);
-        padding: 10px 12px;
-        margin-top: 15px;
-    }
-    .footer-line-1 {
-        font-size: 0.82rem;
-    }
-    .footer-line-2 {
-        font-size: 0.72rem;
-    }
-}
-
-
-
-
-
-
+        @media (max-width: 768px) {
+            .footer-rights-box {
+                width: calc(100% - 20px);
+                padding: 10px 12px;
+                margin-top: 15px;
+            }
+            .footer-line-1 { font-size: 0.82rem; }
+            .footer-line-2 { font-size: 0.72rem; }
+        }
     </style>
 </head>
 <body>
@@ -237,7 +224,7 @@
             </div>
 
             <div class="item-list">
-                <div class="list-item active" onclick="loadPDFDoc('docs\دليل الممارسات الفضلي لجامعة قنا فبراير ٢٠٢٦.pdf', this, true)">
+                <div class="list-item active" onclick="loadPDFDoc('docs/دليل الممارسات الفضلي لجامعة قنا فبراير ٢٠٢٦.pdf', this, true)">
                     <div class="item-icon"><i class="fa-solid fa-book-open"></i></div>
                     <div>دليل الممارسات الفضلى في مجالات العمل الرئيسية بجامعة قنا (الإصدار الأول - فبراير ٢٠٢٦م)</div>
                 </div>
@@ -248,48 +235,39 @@
                     <span class="badge-soon">Coming Soon</span>
                 </div>
 
-                <div class="list-item active" onclick="loadPDFDoc('docs\الدليل المصور لجامعة قنا.pdf', this, true)">
+                <div class="list-item" onclick="loadPDFDoc('docs/الدليل المصور لجامعة قنا.pdf', this, true)">
                     <div class="item-icon"><i class="fa-solid fa-book-open"></i></div>
                     <div>الدليل المصور لجامعة قنا</div>
                 </div>
-
 
                 <div class="list-item" onclick="loadPDFDoc('', this, false)">
                     <div class="item-icon"><i class="fa-solid fa-book-bookmark"></i></div>
                     <div> أطلس مسيرة التطوير بجامعة قنا (٢٠٢٣- ٢٠٢٦م)- الإصدار الأول أكتوبر ٢٠٢٦م</div>
                     <span class="badge-soon">Coming Soon</span>
                 </div>
-
             </div>
         </div>
 
         <!-- منطقة العرض الرئيسية -->
         <div class="main-display" id="mainDisplay">
-            <!-- تحميل الكتاب مباشرة هنا -->
+            <!-- يتم تحميل الملف تلقائياً عبر السكربت -->
         </div>
     </div>
 
-
-
-
-<!-- شريط التوثيق وحقوق الملكية -->
-<footer class="footer-rights-box">
-    <div class="footer-line-1">
-        جميع الحقوق محفوظة لمشروع توثيق مسيرة التطوير بجامعة قنا (مسيرة) -                  <span>    تحت إشراف   :           </span> أ.د. أحمد عكاوي - رئيس الجامعة والمشرف العام     
-
-    </div>
-    <div class="footer-line-2">
-        <span>مدير المشروع:</span> أ.م.د. طارق الكاشف - مدير مركز ضمان الجودة والتأهيل للاعتماد بالجامعة | 
-        أ. وليد عادل صلاح عبد الغفار - المعيد بقسم الجغرافيا ونظم المعلومات الجغرافية بكلية الآداب بالجامعة | 
-    </div>
-    </div>
-    <div class="footer-line-2">
-        د. محمد مهدي خليفة - مدير عام الإدارة العامة للشئون العامة | 
-        أ. سيد عبد الفتاح محمد محمد - الإدارة العامة للعلاقات العامة
-    </div>
-</footer>
-
-
+    <!-- شريط التوثيق وحقوق الملكية -->
+    <footer class="footer-rights-box">
+        <div class="footer-line-1">
+            جميع الحقوق محفوظة لمشروع توثيق مسيرة التطوير بجامعة قنا (مسيرة) - <span>تحت إشراف:</span> أ.د. أحمد عكاوي - رئيس الجامعة والمشرف العام
+        </div>
+        <div class="footer-line-2">
+            <span>مدير المشروع:</span> أ.م.د. طارق الكاشف - مدير مركز ضمان الجودة والتأهيل للاعتماد بالجامعة | 
+            أ. وليد عادل صلاح عبد الغفار - المعيد بقسم الجغرافيا ونظم المعلومات الجغرافية بكلية الآداب بالجامعة | 
+        </div>
+        <div class="footer-line-2">
+            د. محمد مهدي خليفة - مدير عام الإدارة العامة للشئون العامة | 
+            أ. سيد عبد الفتاح محمد محمد - الإدارة العامة للعلاقات العامة
+        </div>
+    </footer>
 
     <script>
         function loadPDFDoc(pdfPath, element, isAvailable) {
@@ -309,10 +287,6 @@
                 return;
             }
 
-            // إعداد معلمات العرض:
-            // view=FitH (تكبير وتوافق أفقي)
-            // page-mode=thumbs (وضع العرض)
-            // toolbar=0 (إخفاء شريط الأدوات)
             const params = '#toolbar=0&navpanes=0&view=FitH';
             const fullPath = encodeURI(pdfPath) + params;
 
@@ -346,7 +320,7 @@
             document.getElementById('sidebarOverlay').classList.remove('active');
         }
 
-        // إغلاق خيارات القائمة اليمنى لمنع الطباعة أو التنزيل
+        // إغلاق قائمة السياق لحماية المحتوى
         document.addEventListener('contextmenu', event => event.preventDefault());
         document.addEventListener('keydown', function(e) {
             if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 's' || e.key === 'u')) {
