@@ -97,9 +97,56 @@
         }
         .list-item.active .item-icon { background: var(--accent-blue); color: #ffffff; }
 
+        .chevron-icon {
+            margin-right: auto;
+            font-size: 0.8rem;
+            color: #64748b;
+            transition: transform 0.3s ease;
+        }
+        .has-submenu.open .chevron-icon {
+            transform: rotate(180deg);
+        }
+
+        /* القائمة الفرعية */
+        .submenu {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            padding-right: 16px;
+            margin-top: -2px;
+            margin-bottom: 4px;
+        }
+        .has-submenu.open + .submenu {
+            display: flex;
+        }
+
+        .submenu-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 9px 12px;
+            border-radius: 8px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            cursor: pointer;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #334155;
+            transition: all 0.2s ease;
+        }
+        .submenu-item:hover, .submenu-item.active {
+            background: #dbeafe;
+            color: var(--accent-blue);
+            border-color: #bfdbfe;
+        }
+
         .badge-soon {
             font-size: 0.68rem; background: #f59e0b; color: #ffffff; padding: 2px 8px;
             border-radius: 12px; margin-right: auto; white-space: nowrap; font-weight: 800;
+        }
+
+        .submenu-item .badge-soon {
+            margin-right: 0;
         }
 
         /* منطقة العرض الرئيسية */
@@ -245,6 +292,75 @@
                     <div> أطلس مسيرة التطوير بجامعة قنا (٢٠٢٣- ٢٠٢٦م)- الإصدار الأول أكتوبر ٢٠٢٦م</div>
                     <span class="badge-soon">Coming Soon</span>
                 </div>
+
+                <div class="list-item" onclick="loadPDFDoc('', this, false)">
+                    <div class="item-icon"><i class="fa-solid fa-map"></i></div>
+                    <div>الخطة الاستراتيجية للجامعة (٢٠٢٤ - ٢٠٣٠م)</div>
+                    <span class="badge-soon">Coming Soon</span>
+                </div>
+
+                <div class="list-item" onclick="loadPDFDoc('', this, false)">
+                    <div class="item-icon"><i class="fa-solid fa-chart-line"></i></div>
+                    <div>المؤشرات الكمية لإنجازات جامعة قنا (٢٠٢٣ - ٢٠٢٦م)</div>
+                    <span class="badge-soon">Coming Soon</span>
+                </div>
+
+                <!-- التقارير السنوية (3 ملفات) -->
+                <div class="list-item has-submenu" onclick="toggleSubmenu(this)">
+                    <div class="item-icon"><i class="fa-solid fa-file-lines"></i></div>
+                    <div>التقارير السنوية لإنجازات الجامعة</div>
+                    <i class="fa-solid fa-chevron-down chevron-icon"></i>
+                </div>
+                <div class="submenu">
+                    <div class="submenu-item" onclick="loadPDFDoc('', this, false)">
+                        <span>التقرير السنوي الأول</span>
+                        <span class="badge-soon">Coming Soon</span>
+                    </div>
+                    <div class="submenu-item" onclick="loadPDFDoc('', this, false)">
+                        <span>التقرير السنوي الثاني</span>
+                        <span class="badge-soon">Coming Soon</span>
+                    </div>
+                    <div class="submenu-item" onclick="loadPDFDoc('', this, false)">
+                        <span>التقرير السنوي الثالث</span>
+                        <span class="badge-soon">Coming Soon</span>
+                    </div>
+                </div>
+
+                <!-- التقارير ربع السنوية (13 ملف) -->
+                <div class="list-item has-submenu" onclick="toggleSubmenu(this)">
+                    <div class="item-icon"><i class="fa-solid fa-calendar-days"></i></div>
+                    <div>التقارير ربع السنوية لإنجازات الجامعة</div>
+                    <i class="fa-solid fa-chevron-down chevron-icon"></i>
+                </div>
+                <div class="submenu">
+                    <div class="submenu-item" onclick="loadPDFDoc('', this, false)"><span>التقرير ربع السنوي 1</span><span class="badge-soon">Coming Soon</span></div>
+                    <div class="submenu-item" onclick="loadPDFDoc('', this, false)"><span>التقرير ربع السنوي 2</span><span class="badge-soon">Coming Soon</span></div>
+                    <div class="submenu-item" onclick="loadPDFDoc('', this, false)"><span>التقرير ربع السنوي 3</span><span class="badge-soon">Coming Soon</span></div>
+                    <div class="submenu-item" onclick="loadPDFDoc('', this, false)"><span>التقرير ربع السنوي 4</span><span class="badge-soon">Coming Soon</span></div>
+                    <div class="submenu-item" onclick="loadPDFDoc('', this, false)"><span>التقرير ربع السنوي 5</span><span class="badge-soon">Coming Soon</span></div>
+                    <div class="submenu-item" onclick="loadPDFDoc('', this, false)"><span>التقرير ربع السنوي 6</span><span class="badge-soon">Coming Soon</span></div>
+                    <div class="submenu-item" onclick="loadPDFDoc('', this, false)"><span>التقرير ربع السنوي 7</span><span class="badge-soon">Coming Soon</span></div>
+                    <div class="submenu-item" onclick="loadPDFDoc('', this, false)"><span>التقرير ربع السنوي 8</span><span class="badge-soon">Coming Soon</span></div>
+                    <div class="submenu-item" onclick="loadPDFDoc('', this, false)"><span>التقرير ربع السنوي 9</span><span class="badge-soon">Coming Soon</span></div>
+                    <div class="submenu-item" onclick="loadPDFDoc('', this, false)"><span>التقرير ربع السنوي 10</span><span class="badge-soon">Coming Soon</span></div>
+                    <div class="submenu-item" onclick="loadPDFDoc('', this, false)"><span>التقرير ربع السنوي 11</span><span class="badge-soon">Coming Soon</span></div>
+                    <div class="submenu-item" onclick="loadPDFDoc('', this, false)"><span>التقرير ربع السنوي 12</span><span class="badge-soon">Coming Soon</span></div>
+                    <div class="submenu-item" onclick="loadPDFDoc('', this, false)"><span>التقرير ربع السنوي 13</span><span class="badge-soon">Coming Soon</span></div>
+                </div>
+
+                <!-- أدلة الخدمات الرقمية (5 ملفات) -->
+                <div class="list-item has-submenu" onclick="toggleSubmenu(this)">
+                    <div class="item-icon"><i class="fa-solid fa-laptop-code"></i></div>
+                    <div>أدلة الخدمات الرقمية للجامعة</div>
+                    <i class="fa-solid fa-chevron-down chevron-icon"></i>
+                </div>
+                <div class="submenu">
+                    <div class="submenu-item" onclick="loadPDFDoc('', this, false)"><span>دليل الخدمات الرقمية 1</span><span class="badge-soon">Coming Soon</span></div>
+                    <div class="submenu-item" onclick="loadPDFDoc('', this, false)"><span>دليل الخدمات الرقمية 2</span><span class="badge-soon">Coming Soon</span></div>
+                    <div class="submenu-item" onclick="loadPDFDoc('', this, false)"><span>دليل الخدمات الرقمية 3</span><span class="badge-soon">Coming Soon</span></div>
+                    <div class="submenu-item" onclick="loadPDFDoc('', this, false)"><span>دليل الخدمات الرقمية 4</span><span class="badge-soon">Coming Soon</span></div>
+                    <div class="submenu-item" onclick="loadPDFDoc('', this, false)"><span>دليل الخدمات الرقمية 5</span><span class="badge-soon">Coming Soon</span></div>
+                </div>
             </div>
         </div>
 
@@ -260,21 +376,24 @@
             جميع الحقوق محفوظة لمشروع توثيق مسيرة التطوير بجامعة قنا (مسيرة) - <span>تحت إشراف:</span> أ.د. أحمد عكاوي - رئيس الجامعة والمشرف العام
         </div>
         <div class="footer-line-2">
-        <span>مدير المشروع:</span>   <span>أ.م.د. طارق الكاشف:</span>- مدير مركز ضمان الجودة والتأهيل للاعتماد بالجامعة | 
-         <span>أ. وليد عادل صلاح عبد الغفار</span> - المعيد بقسم الجغرافيا ونظم المعلومات الجغرافية بكلية الآداب بالجامعة | 
-    </div>
-    </div>
-    <div class="footer-line-2">
-         <span>د. محمد مهدي خليفة</span>- مدير عام الإدارة العامة للشئون العامة | 
-        <span>أ. سيد عبد الفتاح محمد محمد</span> - الإدارة العامة للعلاقات العامة
-    </div>
+            <span>مدير المشروع:</span> <span>أ.م.د. طارق الكاشف:</span>- مدير مركز ضمان الجودة والتأهيل للاعتماد بالجامعة | 
+            <span>أ. وليد عادل صلاح عبد الغفار</span> - المعيد بقسم الجغرافيا ونظم المعلومات الجغرافية بكلية الآداب بالجامعة | 
+        </div>
+        <div class="footer-line-2">
+            <span>د. محمد مهدي خليفة</span>- مدير عام الإدارة العامة للشئون العامة | 
+            <span>أ. سيد عبد الفتاح محمد محمد</span> - الإدارة العامة للعلاقات العامة
+        </div>
     </footer>
 
     <script>
+        function toggleSubmenu(element) {
+            element.classList.toggle('open');
+        }
+
         function loadPDFDoc(pdfPath, element, isAvailable) {
             const display = document.getElementById('mainDisplay');
 
-            document.querySelectorAll('.list-item').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.list-item, .submenu-item').forEach(el => el.classList.remove('active'));
             if (element) element.classList.add('active');
 
             if (!isAvailable || !pdfPath) {
